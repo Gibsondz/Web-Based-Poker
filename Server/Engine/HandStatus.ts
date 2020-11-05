@@ -1,4 +1,6 @@
-class HandStatus
+import { Card } from './Card';
+
+export class HandStatus
 {
     private stackSize: number;
     private folded: boolean;

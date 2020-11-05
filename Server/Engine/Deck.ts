@@ -1,4 +1,8 @@
-class Deck{
+import { Card } from './Card';
+import { CardValue } from './CardValue';
+import { Suit } from './Suit';
+
+export class Deck{
     private cards: Array<Card>;
 
     constructor()

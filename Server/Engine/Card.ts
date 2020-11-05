@@ -1,4 +1,6 @@
-class Card{
+import { CardValue } from './CardValue';
+import { Suit } from './Suit';
+export class Card{
     private value: CardValue;
     private suit: Suit;
 

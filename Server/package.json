@@ -4,11 +4,18 @@
   "description": "Server for web-based-poker",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'engine/tests/**/*.ts'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "typescript": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.0.3",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "ts-node": "^9.0.0"
   }
 }

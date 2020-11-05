@@ -1,4 +1,4 @@
-class Blind
+export class Blind
 {
     private bigBlind: number;
     private smallBlind: number;

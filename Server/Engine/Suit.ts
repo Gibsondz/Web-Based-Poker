@@ -1,4 +1,4 @@
-const enum Suit{
+export const enum Suit{
     Spade,
     Club,
     Heart,

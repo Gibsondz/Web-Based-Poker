@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "target": "ES6",
+        "lib": ["es5", "es6", "dom"],
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outFile": "./app.js",
+        "sourceMap": true
+    },
+    "include": [
+        "*.ts",
+        "Engine/*.ts"
+    ],
+    "exclude": [
+        "./tests/",
+        "../node_modules/",
+        "../dist/"
+    ]
+}

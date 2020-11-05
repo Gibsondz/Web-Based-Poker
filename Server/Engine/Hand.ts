@@ -1,4 +1,11 @@
-class Hand{
+import { Player } from './Player';
+import { Blind } from './Blind';
+import { CircularHandStatusMap } from './CircularHandStatusMap';
+import { Deck } from './Deck';
+import { Card } from './Card';
+import { HandStatus } from './HandStatus';
+
+export class Hand{
 
     private circularHandStatusMap: CircularHandStatusMap;
     private pot: number;
@@ -206,8 +213,6 @@ class Hand{
                 counter++;
             }
         }
-        console.log(counter);
-        console.log(this.getHandStatusMap().size);
         if(counter == this.getHandStatusMap().size)
         {
             return true;
@@ -227,6 +232,7 @@ class Hand{
         if(fromFolding)
         {
             this.declareWinner(fromFolding);
+            this.handStage = this.DONE_STAGE;
             return;
         }
    
@@ -279,6 +285,11 @@ class Hand{
         return this.circularHandStatusMap.getHandStatusMap();
     }
 
+    public getCircularHandStatusMap() : CircularHandStatusMap
+    {
+        return this.circularHandStatusMap;
+    }
+
     public isComplete(): boolean
     {
         if(this.handStage == this.DONE_STAGE)
@@ -300,16 +311,6 @@ class Hand{
         {
             console.log("Fold called for a player that is not currently active: " + player.getName());
         }
-        console.log("Hand Status: ")
-        for(let [player, HandStatus] of this.circularHandStatusMap.getHandStatusMap())
-        {
-                console.log("Player: " + player.getName() + " StackSize: " + HandStatus.getStackSize() + " BetChips: " + HandStatus.getBetChips() );
-        }
-        console.log("Hand Stage: " + this.handStage);
-        console.log("Pot: " + this.pot);
-        console.log("BoardSize: " + this.board.length);
-        console.log("ActionPlayer: " +this.circularHandStatusMap.getActivePlayer().getName())
-
     }
 
     public check(player: Player)
@@ -324,16 +325,6 @@ class Hand{
         {
             console.log("Fold called for a player that is not currently active: " + player.getName());
         }
-        console.log("Hand Status: ")
-        for(let [player, HandStatus] of this.circularHandStatusMap.getHandStatusMap())
-        {
-                console.log("Player: " + player.getName() + " StackSize: " + HandStatus.getStackSize() + " BetChips: " + HandStatus.getBetChips() );
-        }
-        console.log("Hand Stage: " + this.handStage);
-        console.log("Pot: " + this.pot);
-        console.log("BoardSize: " + this.board.length);
-        console.log("ActionPlayer: " +this.circularHandStatusMap.getActivePlayer().getName())
-
     }
 
     public bet(player: Player, amount: number)
@@ -362,16 +353,6 @@ class Hand{
         {
             console.log("Bet called for a player that is not currently active: " + player.getName());
         }
-        console.log("Hand Status: ")
-        for(let [player, HandStatus] of this.circularHandStatusMap.getHandStatusMap())
-        {
-                console.log("Player: " + player.getName() + " StackSize: " + HandStatus.getStackSize() + " BetChips: " + HandStatus.getBetChips() );
-        }
-        console.log("Hand Stage: " + this.handStage);
-        console.log("Pot: " + this.pot);
-        console.log("BoardSize: " + this.board.length);
-        console.log("ActionPlayer: " +this.circularHandStatusMap.getActivePlayer().getName())
-
     }
 
     public call(player: Player)
@@ -386,15 +367,10 @@ class Hand{
         {
             console.log("Call called for a player that is not currently active: " + player.getName());
         }
-        console.log("Hand Status: ")
-        for(let [player, HandStatus] of this.circularHandStatusMap.getHandStatusMap())
-        {
-                console.log("Player: " + player.getName() + " StackSize: " + HandStatus.getStackSize() + " BetChips: " + HandStatus.getBetChips() );
-        }
-        console.log("Hand Stage: " + this.handStage);
-        console.log("Pot: " + this.pot);
-        console.log("BoardSize: " + this.board.length);
-        console.log("ActionPlayer: " +this.circularHandStatusMap.getActivePlayer().getName())
+    }
 
+    public getPotSize() : number
+    {
+        return this.pot;
     }
 }

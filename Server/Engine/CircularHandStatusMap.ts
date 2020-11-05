@@ -1,4 +1,8 @@
-class CircularHandStatusMap
+import { Player } from './Player';
+import { HandStatus } from './HandStatus';
+import { Deck } from './Deck';
+
+export class CircularHandStatusMap
 {
     private handStatusMap: Map<Player, HandStatus>;
     private actionPointer: number;

@@ -1,4 +1,4 @@
-const enum CardValue{
+export const enum CardValue{
     Ace,
     King,
     Queen,

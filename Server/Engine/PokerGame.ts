@@ -1,4 +1,9 @@
-class PokerGame
+import { Player } from './Player';
+import { Hand } from './Hand';
+import { Blind } from './Blind';
+import { GameRender } from './GameRender';
+
+export class PokerGame
 {
     private stackMap: Map<Player, number>;
     private blindLevels: Map<number, Blind>;
@@ -143,10 +148,6 @@ class PokerGame
     private createNewHand()
     {
         this.updateStackMap();
-        for( let [player, stackSize] of this.stackMap )
-        {
-            console.log(player.getName() + " : " + stackSize);
-        }
         this.moveBigBlind();
         this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
     }
@@ -191,45 +192,11 @@ class PokerGame
         this.blindLevels.set(10, new Blind(800,400));
     }
 
+    public getGameRender() : GameRender
+    {
+        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap());
+    }
 }
-
-let game = new PokerGame(3000, 900);
-let bill = new Player("Bill");
-let bob = new Player("Bob")
-game.addPlayer(bob);
-game.addPlayer(bill);
-game.addPlayer(new Player("Jill"));
-game.addPlayer(new Player("Lim"));
-game.addPlayer(new Player("Tack"));
-game.addPlayer(new Player("Chad"));
-game.addPlayer(new Player("Brad"));
-game.addPlayer(new Player("Thad"));
-game.addPlayer(new Player("Clad"));
-game.addPlayer(new Player("I shouldnt be able to be added."));
-game.start();
-
-game.bet(new Player("Clad"), 60);
-game.call(new Player("Thad"));
-game.fold(new Player("Brad"));
-game.fold(new Player("Chad"));
-game.call(new Player("Tack"));
-game.fold(new Player("Lim"));
-game.fold(new Player("Jill"));
-game.fold(new Player("Bill"));
-game.call(new Player("Bob"));
-
-game.bet(new Player("Bob"), 50);
-game.fold(new Player("Clad"));
-game.fold(new Player("Thad"));
-game.call(new Player("Tack"));
-
-game.check(new Player("Bob"));
-game.check(new Player("Tack"));
-
-game.check(new Player("Bob"));
-game.check(new Player("Tack"));
-
-
 
 
 
