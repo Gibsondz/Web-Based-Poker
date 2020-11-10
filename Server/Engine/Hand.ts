@@ -4,6 +4,7 @@ import { CircularHandStatusMap } from './CircularHandStatusMap';
 import { Deck } from './Deck';
 import { Card } from './Card';
 import { HandStatus } from './HandStatus';
+import { BestHand } from './BestHand';
 
 export class Hand{
 
@@ -272,7 +273,30 @@ export class Hand{
                 }
             }
         }
-        //TODO add non-folding cases
+        else {
+            const bestHand = new BestHand(this.getHandStatusMap(), this.getBoard());
+            //infoArray should contain array of 3 elements: Player, winning Array<Card> combination, and the category object
+            const infoArray = bestHand.findWinner();
+            console.log("info array: ", infoArray);
+            //check if outright winner
+            if (infoArray.length === 1) {
+                const winningPlayer = infoArray[0][0];
+                console.log(winningPlayer.getName(),`won ${this.pot} with`, infoArray[0][2].categoryName);
+                console.log(`winning hand: `, infoArray[0][1]);
+                let handStatus = this.getHandStatusMap().get(winningPlayer);
+                handStatus.addToStackSize(this.pot);
+            }
+            else { //split pot
+                for (let i = 0; i < infoArray.length; i++) {
+                    let winningPlayer = infoArray[i][0];
+                    let winnings = Math.floor(this.pot/infoArray.length);
+                    console.log(winningPlayer.getName(),"split pot with ", infoArray[i][2].categoryName);
+                    console.log(`they won ${winnings} with hand: `, infoArray[i][1]);
+                    let handStatus = this.getHandStatusMap().get(winningPlayer);
+                    handStatus.addToStackSize(winnings);
+                }
+            }
+        }
     }
 
     public getActivePlayer(): Player
@@ -323,7 +347,7 @@ export class Hand{
         }
         else
         {
-            console.log("Fold called for a player that is not currently active: " + player.getName());
+            console.log("Check called for a player that is not currently active: " + player.getName());
         }
     }
 
@@ -372,5 +396,11 @@ export class Hand{
     public getPotSize() : number
     {
         return this.pot;
+    }
+
+
+    public getBoard() : Array<Card>
+    {
+        return this.board;
     }
 }
