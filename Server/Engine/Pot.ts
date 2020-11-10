@@ -20,4 +20,9 @@ export class Pot{
     {
         return this.size;
     }
+
+    public getPlayers() : Array<Player>
+    {
+        return this.players;
+    }
 }

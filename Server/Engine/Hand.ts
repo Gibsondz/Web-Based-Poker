@@ -5,6 +5,7 @@ import { Deck } from './Deck';
 import { Card } from './Card';
 import { HandStatus } from './HandStatus';
 import { Pot } from './Pot';
+import { BestHand } from './BestHand';
 
 export class Hand{
 
@@ -205,10 +206,19 @@ export class Hand{
             this.handStage = this.DONE_STAGE;
             return;
         }
-   
+
         this.circularHandStatusMap.prepStatusForNextStage();
 
         this.handStage++;
+        if(this.allButOneAllIn())
+        {
+            while( this.board.length < 5)
+            {
+                this.board.push(this.deck.drawCard());
+            }
+            this.handStage = this.DONE_STAGE;
+        }
+   
         if(this.handStage == this.FLOP_STAGE)
         {
             for(let i = 0; i < 3; i++)
@@ -216,11 +226,19 @@ export class Hand{
                 this.board.push(this.deck.drawCard());
             }
             this.circularHandStatusMap.setActivePlayer(this.smallBlindPosition);
+            if(this.circularHandStatusMap.getHandStatusMap().size == 2) //Special case for heads up hand
+            {
+                this.circularHandStatusMap.next();
+            }
         }
         else if(this.handStage == this.TURN_STAGE || this.handStage == this.RIVER_STAGE)
         {
             this.board.push(this.deck.drawCard());
             this.circularHandStatusMap.setActivePlayer(this.smallBlindPosition);
+            if(this.circularHandStatusMap.getHandStatusMap().size == 2) //Special case for heads up hand
+            {
+                this.circularHandStatusMap.next();
+            }
         }
         else if(this.handStage == this.DONE_STAGE)
         {
@@ -233,7 +251,7 @@ export class Hand{
     {
         if(fromFolding)
         {
-            console.log("Winner of had has been declared from folding");
+            console.log("Winner of hand has been declared from folding");
             for( let [player, handStatus] of this.getHandStatusMap() )
             {
                 if(!handStatus.isFolded())
@@ -245,7 +263,49 @@ export class Hand{
                 }
             }
         }
-        //TODO add non-folding cases - Need hand decision class
+        else 
+        {
+            for(let pot of this.pots)
+            {
+                //Create temporary hand status map only for players of the pot.
+                let tempStatusMap = new Map<Player, HandStatus>();
+                for(let player of pot.getPlayers())
+                {
+                    tempStatusMap.set(player, this.getHandStatusMap().get(player));
+                }
+                
+                if(tempStatusMap.size === 1) //Special case for 1 man pots
+                {
+                    let handStatus = this.getHandStatusMap().get(Array.from(tempStatusMap.keys())[0]); //Get only player inserted
+                    handStatus.addToStackSize(pot.getSize()); //Since its the only player for the pot give them the chips
+                }
+                else
+                {
+                    const bestHand = new BestHand(tempStatusMap, this.getBoard());
+                    //infoArray should contain array of 3 elements: Player, winning Array<Card> combination, and the category object
+                    const infoArray = bestHand.findWinner();
+                    console.log("info array: ", infoArray);
+                    //check if outright winner
+                    if (infoArray.length === 1) {
+                        const winningPlayer = infoArray[0][0];
+                        console.log(winningPlayer.getName(),`won ${pot.getSize()} with`, infoArray[0][2].categoryName);
+                        console.log(`winning hand: `, infoArray[0][1]);
+                        let handStatus = this.getHandStatusMap().get(winningPlayer);
+                        handStatus.addToStackSize(pot.getSize());
+                    }
+                    else { //split pot
+                        for (let i = 0; i < infoArray.length; i++) {
+                            let winningPlayer = infoArray[i][0];
+                            let winnings = Math.floor(pot.getSize()/infoArray.length);
+                            console.log(winningPlayer.getName(),"split pot with ", infoArray[i][2].categoryName);
+                            console.log(`they won ${winnings} with hand: `, infoArray[i][1]);
+                            let handStatus = this.getHandStatusMap().get(winningPlayer);
+                            handStatus.addToStackSize(winnings);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public getActivePlayer(): Player
@@ -296,7 +356,7 @@ export class Hand{
         }
         else
         {
-            console.log("Fold called for a player that is not currently active: " + player.getName());
+            console.log("Check called for a player that is not currently active: " + player.getName());
         }
     }
 
@@ -357,7 +417,7 @@ export class Hand{
                 {
                     playerArray.push(player);
                 }
-                if(handStatus.getBetChips() < lowestBet && !this.getHandStatusMap().get(player).isFolded())
+                if(handStatus.getBetChips() < lowestBet && !this.getHandStatusMap().get(player).isFolded() && this.getHandStatusMap().get(player).getBetChips() != 0)
                 {
                     lowestBet = handStatus.getBetChips();
                 }
@@ -376,8 +436,8 @@ export class Hand{
             {
                 finished = true;
             }
+            
         }
-
         //Now must add the current made pot to the pots array
         let playerArray = new Array<Player>();
         let pot = new Pot(playerArray);
@@ -389,7 +449,30 @@ export class Hand{
             }
             pot.add(this.getHandStatusMap().get(player).getBetChips());
         }
-        this.pots.push(pot)
+        if(playerArray.length != 0) // Player array is 0 if it was a check down hand stage. This will cause errors when determining the winner. So we ignore this pot.
+        {
+            this.pots.push(pot);
+        }
+    }
+
+    private allButOneAllIn() : Boolean
+    {
+        let counter = 0;
+        for( let [player, handStatus] of this.circularHandStatusMap.getHandStatusMap() )
+        {
+            if(handStatus.isFolded() || handStatus.isAllIn())
+            {
+                counter++;
+            }
+        }
+        if(counter >= this.getHandStatusMap().size - 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public getPotSize() : number
@@ -402,4 +485,13 @@ export class Hand{
         return total
     }
 
+    public getPots() : Array<Pot>
+    {
+        return this.pots;
+    }
+
+    public getBoard() : Array<Card>
+    {
+        return this.board;
+    }
 }

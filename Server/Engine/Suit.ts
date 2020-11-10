@@ -1,6 +1,6 @@
 export const enum Suit{
-    Spade,
-    Club,
-    Heart,
-    Diamond
+    Spade = 1,
+    Club = 2,
+    Heart = 4,
+    Diamond = 8
 }
