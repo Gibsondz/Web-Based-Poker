@@ -4,11 +4,12 @@ import { CircularHandStatusMap } from './CircularHandStatusMap';
 import { Deck } from './Deck';
 import { Card } from './Card';
 import { HandStatus } from './HandStatus';
+import { Pot } from './Pot';
 
 export class Hand{
 
     private circularHandStatusMap: CircularHandStatusMap;
-    private pot: number;
+    private pots: Array<Pot>;
     private handStage: number; //0 -> Preflop 1 -> flop 2 -> turn 3 -> river 4 -> done
     private deck: Deck;
     private board: Array<Card>;
@@ -63,7 +64,7 @@ export class Hand{
         }
 
         this.smallBlindPosition = smallBlindPosition;
-        this.pot = 0;
+        this.pots = new Array<Pot>();
         this.board = new Array<Card>();
         this.circularHandStatusMap = new CircularHandStatusMap(handStatusMap, initialActionPointer);
         this.dealCards();
@@ -123,19 +124,13 @@ export class Hand{
         if(this.everyoneFolded())
         {
             //Hand stage completed from folding.
+            this.calculatePots();
             this.nextHandStage(true);
             return;
         }
-        else if(this.everyoneChecked())
+        else if(this.everyoneChecked() || this.highestBetMatched())
         {
-            this.nextHandStage(false);
-        }
-        else if(this.highestBetMatched() && this.allButOneAllIn())
-        {
-            //TODO
-        }
-        else if(this.highestBetMatched())
-        {
+            this.calculatePots();
             this.nextHandStage(false);
         }
     }
@@ -146,26 +141,6 @@ export class Hand{
         for( let [player, handStatus] of this.getHandStatusMap() )
         {
             if(handStatus.isFolded())
-            {
-                counter++;
-            }
-        }
-        if(counter == this.getHandStatusMap().size - 1)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private allButOneAllIn(): boolean
-    {
-        let counter = 0;
-        for( let [player, handStatus] of this.getHandStatusMap() )
-        {
-            if(handStatus.isAllIn() || handStatus.isFolded())
             {
                 counter++;
             }
@@ -204,7 +179,7 @@ export class Hand{
         let counter = 0;
         for( let [player, handStatus] of this.getHandStatusMap() )
         {
-            if((handStatus.getBetChips() < highestBet) && !handStatus.isFolded() || highestBet == 0)
+            if((handStatus.getBetChips() < highestBet) && !handStatus.isFolded() && !handStatus.isAllIn() || highestBet == 0)
             {
                return false;
             }
@@ -220,15 +195,10 @@ export class Hand{
         return false;
     }
 
-    //Must add all bets to the pot. Check to see if the hand is complete and a winner should be calculated/declared.
+    //Check to see if the hand is complete and a winner should be calculated/declared.
     //If a winner should not be declared move hand to the next stage.
     private nextHandStage(fromFolding: boolean)
     {
-        for( let [player, handStatus] of this.getHandStatusMap() )
-        {
-            this.pot += handStatus.getBetChips();
-        }
-
         if(fromFolding)
         {
             this.declareWinner(fromFolding);
@@ -268,11 +238,14 @@ export class Hand{
             {
                 if(!handStatus.isFolded())
                 {
-                    handStatus.addToStackSize(this.pot);
+                    for(let pot of this.pots)
+                    {
+                        handStatus.addToStackSize(pot.getSize());
+                    }
                 }
             }
         }
-        //TODO add non-folding cases
+        //TODO add non-folding cases - Need hand decision class
     }
 
     public getActivePlayer(): Player
@@ -368,9 +341,65 @@ export class Hand{
             console.log("Call called for a player that is not currently active: " + player.getName());
         }
     }
+    
+    //Called after next hand stage has been determined. It will go through the current players
+    //And bets and create the needed side pots.
+    private calculatePots()
+    {
+        let finished = false;
+        while(!finished)
+        {
+            let playerArray = new Array<Player>()
+            let lowestBet = Infinity;
+            for( let [player, handStatus] of this.getHandStatusMap() )
+            {
+                if(!this.getHandStatusMap().get(player).isFolded() && this.getHandStatusMap().get(player).getBetChips() != 0) //If a player is currently not folded they should be included in the pot object.
+                {
+                    playerArray.push(player);
+                }
+                if(handStatus.getBetChips() < lowestBet && !this.getHandStatusMap().get(player).isFolded())
+                {
+                    lowestBet = handStatus.getBetChips();
+                }
+            }
+            if(lowestBet < this.circularHandStatusMap.getHighestBet()) //If the lowestbet is lower than highest bet and we move to next hand stage it means there was an all-in that needs a side pot.
+            {
+                let sidePot = new Pot(playerArray);
+                for( let p of playerArray )
+                {
+                    sidePot.add(lowestBet);
+                    this.getHandStatusMap().get(p).removeFromBet(lowestBet);
+                }
+                this.pots.push(sidePot);
+            }
+            else
+            {
+                finished = true;
+            }
+        }
+
+        //Now must add the current made pot to the pots array
+        let playerArray = new Array<Player>();
+        let pot = new Pot(playerArray);
+        for( let [player, handStatus] of this.getHandStatusMap() )
+        {
+            if(!this.getHandStatusMap().get(player).isFolded() && this.getHandStatusMap().get(player).getBetChips() != 0) //If a player is currently not folded they should be included in the pot object.
+            {
+                playerArray.push(player);
+            }
+            pot.add(this.getHandStatusMap().get(player).getBetChips());
+        }
+        this.pots.push(pot)
+    }
 
     public getPotSize() : number
     {
-        return this.pot;
+        let total = 0;
+        for(let pot of this.pots)
+        {
+            total += pot.getSize();
+        }
+        return total
     }
+
 }

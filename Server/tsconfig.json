@@ -7,7 +7,8 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "outFile": "./app.js",
-        "sourceMap": true
+        "sourceMap": true,
+        "types": ["jest", "node"]
     },
     "include": [
         "*.ts",

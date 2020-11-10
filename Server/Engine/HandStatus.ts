@@ -96,4 +96,9 @@ export class HandStatus
         this.checked = false;
         this.betChips = 0;
     }
+
+    public removeFromBet(amount : number)
+    {
+        this.betChips -= amount;
+    }
 }

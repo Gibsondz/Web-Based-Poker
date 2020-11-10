@@ -1,6 +1,7 @@
 import { PokerGame } from '../Pokergame';
 import { Player } from '../Player';
 import { expect } from 'chai';
+import { describe } from 'mocha'; 
 
 describe('Poker Game Scenerios', () => { //Test container for poker game scenarios
     it('Basic Sample Hand', () => {
