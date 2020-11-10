@@ -1,6 +1,11 @@
 import { PokerGame } from '../Pokergame';
 import { Player } from '../Player';
 import { expect } from 'chai';
+import { BestHand } from '../BestHand';
+import { Card } from '../Card';
+import { CardValue } from '../CardValue';
+import { Suit } from '../Suit';
+import { Categories } from '../Categories';
 
 describe('Poker Game Scenerios', () => { //Test container for poker game scenarios
     it('Basic Sample Hand', () => {
@@ -190,5 +195,122 @@ describe('Poker Game Scenerios', () => { //Test container for poker game scenari
         expect(game.getGameRender().getHandStatusMap().get(Bob).getBetChips()).to.equal(15); //Bob should be small blind now
         expect(game.getGameRender().getPotsize()).to.equal(0);
 
+    });
+
+    it('Test getCategoryIndex function', () => {
+        let pokerGame = new PokerGame(3000,900);
+        let Bob = new Player("Bob");
+        let John = new Player("John");
+        pokerGame.addPlayer(Bob);
+        pokerGame.addPlayer(John);
+        pokerGame.start();
+        //check if board one is a royal flush
+        let board1 = [
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Queen,Suit.Spade),
+            new Card(CardValue.King,Suit.Spade),
+            new Card(CardValue.Ace,Suit.Spade)];
+        let checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board1);
+        expect(checkBestHand.getCategoryIndex(board1.map(c => c.getValue()),board1.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.RF));
+        //check if board two is a straight flush
+        let board2 = [
+            new Card(CardValue.Four,Suit.Spade),
+            new Card(CardValue.Five,Suit.Spade),
+            new Card(CardValue.Six,Suit.Spade),
+            new Card(CardValue.Seven,Suit.Spade),
+            new Card(CardValue.Eight,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board2);
+        expect(checkBestHand.getCategoryIndex(board2.map(c => c.getValue()),board2.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.SF));
+        //check if board is a straight flush
+        let board = [
+            new Card(CardValue.Two,Suit.Spade),
+            new Card(CardValue.Three,Suit.Spade),
+            new Card(CardValue.Four,Suit.Spade),
+            new Card(CardValue.Five,Suit.Spade),
+            new Card(CardValue.Ace,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.SF));
+        //check if board is Four of a Kind
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Eight,Suit.Club),
+            new Card(CardValue.Eight,Suit.Heart),
+            new Card(CardValue.Eight,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.FK));
+        //check if board is Full House
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Eight,Suit.Club),
+            new Card(CardValue.Eight,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.FH));
+        //check if board is Flush
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Six,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.FL));
+        //check if board is Straight
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Seven,Suit.Diamond)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.ST));
+        //check if board is Straight
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Queen,Suit.Diamond)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.ST));
+        //check if board is Three of a Kind
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Eight,Suit.Club),
+            new Card(CardValue.Eight,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Ten,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.TK));
+        //check if board is Two Pair
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Eight,Suit.Club),
+            new Card(CardValue.Six,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.TP));
+        //check if board is One Pair
+        board = [
+            new Card(CardValue.Eight,Suit.Spade),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Seven,Suit.Spade),
+            new Card(CardValue.Seven,Suit.Diamond)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.OP));
+        //check if board is High Card
+        board = [
+            new Card(CardValue.Ace,Suit.Spade),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Seven,Suit.Diamond)];
+        checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
+        expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.HC));
     });
 });
