@@ -13,6 +13,7 @@ export class PokerGame
     private stackSize: number;
     private currentBlindLevel: number;
     private bigBlindPointer: number;
+    private finished: boolean;
 
     constructor(stackSize: number, blindTimer: number)
     {
@@ -23,6 +24,7 @@ export class PokerGame
         this.populateBlindLevels();
         this.currentBlindLevel = 1;
         this.bigBlindPointer = 0;
+        this.finished = false;
     }
 
     public addPlayer(player: Player)
@@ -148,8 +150,15 @@ export class PokerGame
     private createNewHand()
     {
         this.updateStackMap();
-        this.moveBigBlind();
-        this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
+        if(this.isGameFinished())
+        {
+            this.finished = true;
+        }
+        else
+        {
+            this.moveBigBlind();
+            this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
+        }
     }
 
     private moveBigBlind()
@@ -194,7 +203,32 @@ export class PokerGame
 
     public getGameRender() : GameRender
     {
-        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap());
+        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), this.currentHand.getPots());;
+    }
+
+    public isFinished() : boolean
+    {
+        return this.finished;
+    }
+
+    private isGameFinished() : boolean
+    {
+        let counter = 0;
+        for( let [player, stackSize] of this.stackMap )
+        {
+            if(stackSize === 0)
+            {
+                counter++;
+            }
+        }
+        if(counter >= this.stackMap.size - 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

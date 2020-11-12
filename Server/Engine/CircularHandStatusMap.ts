@@ -18,18 +18,20 @@ export class CircularHandStatusMap
 
     public next()
     {
-
-        do {
-            if( this.actionPointer - 1 < 0)
-            {
-                this.actionPointer = this.handStatusMap.size - 1;
+        if(!this.allAreAllIn())   // Dont loop through in this case as we could have a never ending loop if everyone is either folder or all in.
+        {                         //Hand should end shortly after in this case.
+            do {
+                if( this.actionPointer - 1 < 0)
+                {
+                    this.actionPointer = this.handStatusMap.size - 1;
+                }
+                else
+                {
+                    this.actionPointer -= 1;
+                }
             }
-            else
-            {
-                this.actionPointer -= 1;
-            }
+            while(Array.from(this.handStatusMap.values())[this.actionPointer].isFolded() || Array.from(this.handStatusMap.values())[this.actionPointer].isAllIn())
         }
-        while(Array.from(this.handStatusMap.values())[this.actionPointer].isFolded())
     }
 
     public getActivePlayer(): Player
@@ -40,7 +42,7 @@ export class CircularHandStatusMap
     public setActivePlayer(index: number)
     {
         this.actionPointer = index;
-        if(Array.from(this.handStatusMap.values())[this.actionPointer].isFolded())
+        if(Array.from(this.handStatusMap.values())[this.actionPointer].isFolded() || Array.from(this.handStatusMap.values())[this.actionPointer].isAllIn())
         {
             this.next();
         }
@@ -81,6 +83,26 @@ export class CircularHandStatusMap
             }
         }
         return highestBet;
+    }
+
+    private allAreAllIn() : Boolean
+    {
+        let counter = 0;
+        for( let [player, handStatus] of this.handStatusMap )
+        {
+            if(handStatus.isFolded() || handStatus.isAllIn())
+            {
+                counter++;
+            }
+        }
+        if(counter == this.getHandStatusMap().size )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public prepStatusForNextStage()
