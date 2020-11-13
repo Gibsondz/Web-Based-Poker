@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES2017",
+        "outDir": "dist",
+        "pretty": true,
+        "strict": true,
+        "alwaysStrict": true,
+        "noImplicitThis": false,
+        "noUnusedLocals": true,
+        "strictNullChecks": false,
+        "noUnusedParameters": false,
+        "noFallthroughCasesInSwitch": true,
+        "baseUrl": ".",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "lib": [ "ESNext" ],
+        "typeRoots": [
+            "src/_typings",
+            "node_modules/@types"
+        ]
+    }
+}
