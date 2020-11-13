@@ -1,0 +1,53 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "chart.js": "2.8.0",
+    "core-js": "2.6.5",
+    "crypto-js": "3.1.9-1",
+    "hls.js": "^0.13.1",
+    "random-text-generator": "^3.0.1",
+    "three": "^0.107.0",
+    "v-infinite-scroll": "^1.0.4",
+    "vue": "2.6.10",
+    "vue-class-component": "7.0.2",
+    "vue-draggable-resizable": "^2.2.0",
+    "vue-moveable": "^1.8.2",
+    "vue-property-decorator": "8.1.0",
+    "vue-router": "^3.1.6",
+    "vue-twitch-player": "^1.0.8",
+    "vue-youtube": "^1.4.0",
+    "vuetify": "2.0.4"
+  },
+  "devDependencies": {
+    "@types/chart.js": "^2.9.20",
+    "@types/crypto-js": "^3.1.43",
+    "@types/googlepay": "^0.2.3",
+    "@types/vue": "^2.0.0",
+    "@vue/cli-plugin-babel": "3.9.0",
+    "@vue/cli-plugin-typescript": "3.9.0",
+    "@vue/cli-service": "3.9.0",
+    "axios": "^0.19.2",
+    "sass": "^1.26.10",
+    "sass-loader": "7.1.0",
+    "typescript": "3.4.3",
+    "vue-cli-plugin-axios-ts": "1.0.2",
+    "vue-cli-plugin-vuetify": "0.6.1",
+    "vue-template-compiler": "2.6.10",
+    "vuetify-loader": "1.2.2"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
