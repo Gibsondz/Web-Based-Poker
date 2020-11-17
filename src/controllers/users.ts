@@ -3,25 +3,65 @@ import { User, } from '../entities'
 
 
 export async function login(req: Request, res: Response, next: NextFunction) {
-    const user = await User.findOne(req.body.username)
+    let user = await User.createQueryBuilder('user')
+        .where("user.username = :username AND user.password = :password",{
+            username: req.body.username,
+            password: req.body.password
+        })
+        .getOne()
+    
     if(user){
-        if(user.password === req.body.password){
-            res.json('found')
-        }else{
-            res.json('wrong-password')
-        }
+        res.json({
+            message: 'found',
+            user: user
+        })
     }else{
         res.json('not-found')
     }
 
 }
 export async function signUp(req: Request, res: Response, next: NextFunction) {
+    let ID = '_' + Math.random().toString(36).substr(2, 9);
+    
+    console.log(ID)
     let user = new User()
-    user.id = req.body.username
+    user.id = ID
     user.username = req.body.username
     user.email = req.body.email
     user.password = req.body.password
     user.save()
-    res.json('success')
+    res.json(user)
+
+
+// let users = await User.query("DROP TABLE[user]")
+// console.log(users)
+
+}
+export async function getUser(req: Request, res: Response, next: NextFunction) {
+    let user = await User.findOneOrFail(req.body.id)
+    console.log(user)
+    res.json({
+        user: user
+    })
+
+
+}
+export async function updateUser(req: Request, res: Response, next: NextFunction) {
+    let user = await User.findOneOrFail(req.body.id)
+    if(user.password !== req.body.password){
+        res.json('incorrect password')
+    }else if( req.body.newPassword !== req.body.confirmNewPassword){
+        res.json('passwords do not match')
+    }else{
+        user.username = req.body.username
+        user.password = req.body.newPassword
+        user.email = req.body.email
+        user.save()
+        res.json({
+            message: 'success',
+            user: user
+        })
+    }
+
 
 }

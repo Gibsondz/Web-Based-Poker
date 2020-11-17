@@ -5,6 +5,9 @@ import { EntityBase } from './EntityBase'
 export class User extends EntityBase {
 
     @Column()
+    id: string
+
+    @Column()
     username: string
 
     @Column({ unique: true, nullable: true })
