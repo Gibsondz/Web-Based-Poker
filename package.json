@@ -12,10 +12,12 @@
     "scripts": {
         "dev": "set NODE_ENV=development&&ts-node ./src/server.ts",
         "build": "tsc && tsc && copyfiles src/**/*.html package.json package-lock.json src/.env.* dist",
-        "start": "node ./src/index.js"
+        "start": "node ./src/index.js",
+        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'src/utils/engine/tests/**/*.ts'"
     },
     "dependencies": {
         "@d-fischer/passport-twitch": "^1.0.5",
+        "@types/jest": "^26.0.15",
         "ali-oss": "^6.10.0",
         "axios": "^0.18.1",
         "bcryptjs": "^2.4.3",
@@ -58,6 +60,8 @@
         "@types/passport-local": "^1.0.33",
         "@types/stripe": "^7.13.24",
         "@types/ws": "^6.0.4",
-        "copyfiles": "^2.3.0"
+        "chai": "^4.2.0",
+        "copyfiles": "^2.3.0",
+        "mocha": "^8.2.1"
     }
 }
