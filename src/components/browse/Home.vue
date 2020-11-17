@@ -59,8 +59,10 @@ export default {
                 password: this.password
             })
             console.log(res)
-            if(res.data === 'found')
+            if(res.data.message === 'found')
             {
+                document.cookie = 'place=pokergame'
+                document.cookie = `name=${res.data.user.id}`
                 window.location.href = "/lobby"
 
             }

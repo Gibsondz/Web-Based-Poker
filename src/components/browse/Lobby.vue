@@ -1,13 +1,17 @@
 <template>
-    <v-container>
-        <h1 class="center">
-            Lobby
-        </h1>
-    </v-container>
+<div>
+<nav-bar></nav-bar>
+<div style = "position:relative; top:80px;">
+<h1 >Lobby</h1>
+</div>
+</div>
 </template>
 <script>
+import navBar from './navBar'
+import NavBar from './navBar.vue'
 export default {
     components: {
+        NavBar
     },
     data() {
         return {
@@ -25,10 +29,7 @@ export default {
 </script>
 <style scoped>
 
-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 20%;
+title {
+    margin-top: 100px;
 }
 </style>

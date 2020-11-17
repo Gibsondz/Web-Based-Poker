@@ -49,6 +49,8 @@ export default {
                 email: this.email
             })
             console.log(res)
+            document.cookie = 'place=pokergame'
+            document.cookie = `name=${res.data.id}`
             this.$emit('success')
         }
 
