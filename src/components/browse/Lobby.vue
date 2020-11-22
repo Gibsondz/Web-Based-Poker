@@ -1,17 +1,16 @@
 <template>
 <div>
-<nav-bar></nav-bar>
-<div style = "position:relative; top:80px;">
 <h1 >Lobby</h1>
-</div>
+<game-list @join-game="display"></game-list>
 </div>
 </template>
 <script>
-import navBar from './navBar'
-import NavBar from './navBar.vue'
+import NavBar from './navBar'
+import GameList from './gameList'
 export default {
     components: {
-        NavBar
+        NavBar,
+        GameList
     },
     data() {
         return {
@@ -23,6 +22,10 @@ export default {
         
     },    
     methods:{
+        display(event){
+            this.$emit('join-game', event)
+
+        }
 
     }
 }

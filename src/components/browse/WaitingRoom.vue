@@ -32,39 +32,130 @@
 export default {
     components: {
     },
+    props: {
+         isHost: Boolean,
+         pokerGameId: String,
+         pokerGameHost: String
+    },
     data() {
         // TODO remove sample data
         return {
-            user: null,
-            username: 'me',
-            password: '',
-            email: '',
-            isHost:true,
-            
-            host:'bob',
+            user: null, 
+            gameId: '',
+            host:'',
 
             gameData:{
                 startingStack:3000,
-                blindTimer:'15 minutes',
+                blindTimer: 15,
                 startingBlinds:'15/30',
             },
 
-            players: [{
-                username: "robby"
-            },
-            {
-                username: "dilbert"
-            },
-            {
-                username: "bobby"
-            }],
+            players: [],
         }
     },
     async created() {
-    },    
+        let allCookies = document.cookie
+        let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
+        let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
+        this.id = id
+        console.log(id)
+        let res  = await this.$axios.post('/users/getUser', {
+        id: id,
+        })
+        
+        this.user = res.data.user
+        console.log(this.isHost)
+        if(this.isHost){
+            res  = await this.$axios.post('/game/openLobby', {
+                    stackSize: this.gameData.startingStack,
+                    blindTimer: this.gameData.blindTimer,
+                    username: this.user.username
+                })
+                this.host = this.user.username
+                this.gameId = res.data.gameId
+                if(res.data.message){
+                    let res  = await this.$axios.post('/game/fetchPlayers', {
+                        gameId: this.gameId
+                    })
+                    let players = res.data
+                    for(let i = 0; i < players.length; i++){
+                        if(players[i].name !== this.host){
+                            this.players.push({username: players[i].name})
+                        }
+                    }
+                }
+
+        }else{
+                this.gameId = this.pokerGameId
+                this.host = this.pokerGameHost
+                 let res  = await this.$axios.post('/game/fetchPlayers', {
+                        gameId: this.gameId
+                    })
+                let players = res.data
+            if(!players.find(me => me.name === this.user.username)){
+                let res  = await this.$axios.post('/game/newPlayer', {
+                        username: this.user.username,
+                        gameId: this.gameId
+                    })
+                this.players.push({username: this.user.username})
+                    
+            }
+            for(let i = 0; i < players.length; i++){
+                    if(players[i].name !== this.host){
+                        this.players.push({username: players[i].name})
+                    }
+                }
+
+        }
+        if(!this.$ws.connected) await this.$ws.connect()
+        this.$ws.on(`${this.gameId}/pokerLobby`, this.addPlayer)
+        this.$ws.on(`${this.gameId}/pokerLobbyLeave`, this.leave)
+
+
+    }, 
+    async destroyed() {
+        if(this.isHost){
+            await this.$axios.post('/game/closeLobby', {
+                gameId: this.gameId
+            })
+        }else{
+             await this.$axios.post('/game/kickPlayer', {
+                gameId: this.gameId,
+                username: this.user.username
+            })
+
+        }
+
+    }, 
+      
     methods:{
-        async leave(){
-            // TODO
+        async addPlayer({method, value}){
+            console.log(value)
+            this.players.push(value)
+        },
+        async leave({method, value}){
+            for(let i = 0; i < this.players.length; i++){
+                if(this.players[i].username === value.username){
+                    this.players.splice(i, 1)
+                }
+                
+            }
+        },
+        async someMethod(e){
+        if(this.isHost){
+            await this.$axios.post('/game/closeLobby', {
+                gameId: this.gameId
+            })
+        }else{
+             await this.$axios.post('/game/kickPlayer', {
+                gameId: this.gameId,
+                username: this.user.username
+            })
+
+        }
+        return
+        
+
         },
         async end(){
             // TODO
