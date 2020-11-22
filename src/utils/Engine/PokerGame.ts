@@ -5,7 +5,9 @@ import { GameRender } from './GameRender';
 
 export class PokerGame
 {
-    private stackMap: Map<Player, number>;
+    public id: String;
+    public host: String;
+    public stackMap: Map<Player, number>;
     private blindLevels: Map<number, Blind>;
     private blindTimer: number;
     private currentHand: Hand;
@@ -15,8 +17,10 @@ export class PokerGame
     private bigBlindPointer: number;
     private finished: boolean;
 
-    constructor(stackSize: number, blindTimer: number)
+    constructor(Host: string, stackSize: number, blindTimer: number)
     {
+        this.host = Host
+        this.id = '_' + Math.random().toString(36).substr(2, 9);
         this.stackMap = new Map<Player, number>();
         this.stackSize = stackSize;
         this.started = false;

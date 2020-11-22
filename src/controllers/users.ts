@@ -39,7 +39,6 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
 }
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     let user = await User.findOneOrFail(req.body.id)
-    console.log(user)
     res.json({
         user: user
     })

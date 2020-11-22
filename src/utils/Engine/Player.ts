@@ -1,6 +1,6 @@
 export class Player
 {
-    private name: string;
+    public name: string;
 
     constructor(name: string)
     {
