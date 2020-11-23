@@ -1,10 +1,10 @@
 <template>
 <div>
-<nav-bar @account="Account()" @lobby="Lobby()" @new-game="newGame()" ></nav-bar>
+<nav-bar @account="Account()" @lobby="Lobby()"  ></nav-bar>
     <div style = "position:relative; top:80px;">
-        <lobby @join-game="join" v-if="showLobby"></lobby>
+        <lobby @new-game="newGame" @join-game="join" v-if="showLobby"></lobby>
         <account v-if="showAccount"></account>
-        <waiting-room v-if="showNewGame" :isHost="isHost" :pokerGameId="gameId" :pokerGameHost="host"></waiting-room>
+        <waiting-room v-if="showNewGame" :blindTimer="blindTimer" :name="name" :password="password" :isHost="isHost" :pokerGameId="gameId" :pokerGameHost="host"></waiting-room>
     </div>
 </div>
 </template>
@@ -22,6 +22,9 @@ export default {
     },
     data() {
         return {
+            blindTimer: 0,
+            name: '',
+            password: '',
             user: null,
             showLobby: true,
             showAccount: false,
@@ -63,7 +66,13 @@ export default {
             this.showNewGame = false
             document.cookie = 'tab=lobby'
         },
-        newGame(){
+        newGame(event){
+            if(event){
+                this.password = event.password
+                this.name = event.name 
+                this.blindTimer = Number(event.blindTimer) 
+                document.cookie = `timer=${this.blindTimer}`
+            }
             document.cookie = 'tab=hostGame'
             this.showAccount = false
             this.showLobby = false
@@ -76,8 +85,10 @@ export default {
             if(event){
                 this.gameId = event.id
                 this.host = event.host
+                this.blindTimer = event.blindTimer
                 document.cookie = `gameId=${event.id}`
                 document.cookie = `host=${event.host}`
+                document.cookie = `timer=${this.blindTimer}`
             }else{ 
             let allCookies = document.cookie
              this.gameId = allCookies.split('; ').find(row => row.startsWith('gameId')).split('=')[1]

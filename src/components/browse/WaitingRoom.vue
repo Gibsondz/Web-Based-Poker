@@ -33,9 +33,12 @@ export default {
     components: {
     },
     props: {
-         isHost: Boolean,
-         pokerGameId: String,
-         pokerGameHost: String
+        isHost: Boolean,
+        pokerGameId: String,
+        pokerGameHost: String,
+        blindTimer: Number,
+        name: String,
+        password: String,
     },
     data() {
         // TODO remove sample data
@@ -46,7 +49,7 @@ export default {
 
             gameData:{
                 startingStack:3000,
-                blindTimer: 15,
+                blindTimer: this.blindTimer,
                 startingBlinds:'15/30',
             },
 
@@ -58,7 +61,6 @@ export default {
         let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
         let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
         this.id = id
-        console.log(id)
         let res  = await this.$axios.post('/users/getUser', {
         id: id,
         })
@@ -68,8 +70,10 @@ export default {
         if(this.isHost){
             res  = await this.$axios.post('/game/openLobby', {
                     stackSize: this.gameData.startingStack,
-                    blindTimer: this.gameData.blindTimer,
-                    username: this.user.username
+                    blindTimer: this.blindTimer,
+                    username: this.user.username,
+                    password: this.password || '',
+                    name: this.name || ''
                 })
                 this.host = this.user.username
                 this.gameId = res.data.gameId
@@ -77,6 +81,10 @@ export default {
                     let res  = await this.$axios.post('/game/fetchPlayers', {
                         gameId: this.gameId
                     })
+                    let allCookies = document.cookie
+                    let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
+                    this.gameData.blindTimer = Number(timer)
+
                     let players = res.data
                     for(let i = 0; i < players.length; i++){
                         if(players[i].name !== this.host){
@@ -100,6 +108,8 @@ export default {
                 this.players.push({username: this.user.username})
                     
             }
+             let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
+            this.gameData.blindTimer = Number(timer)
             for(let i = 0; i < players.length; i++){
                     if(players[i].name !== this.host){
                         this.players.push({username: players[i].name})

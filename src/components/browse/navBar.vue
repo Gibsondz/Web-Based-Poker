@@ -15,9 +15,6 @@
     <v-toolbar-title>Lobby</v-toolbar-title>
     </v-btn>
 
-    <v-btn elevation="0" color="#fff" @click="$emit('new-game')">
-    <v-toolbar-title>Create Game</v-toolbar-title>
-    </v-btn>
       <v-spacer></v-spacer>
     </v-app-bar>
   </v-card>
