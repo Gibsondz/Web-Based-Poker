@@ -7,9 +7,12 @@ export class PokerGame
 {
     public id: String;
     public host: String;
+    public name: String;
+    public password: String;
+    public totalPlayers: number;
     public stackMap: Map<Player, number>;
+    public blindTimer: number;
     private blindLevels: Map<number, Blind>;
-    private blindTimer: number;
     private currentHand: Hand;
     private started: boolean;
     private stackSize: number;
@@ -17,9 +20,12 @@ export class PokerGame
     private bigBlindPointer: number;
     private finished: boolean;
 
-    constructor(Host: string, stackSize: number, blindTimer: number)
+    constructor(Host: string, stackSize: number, blindTimer: number, name: string, password)
     {
-        this.host = Host
+        this.totalPlayers = 0
+        this.name = name;
+        this.password = password;
+        this.host = Host;
         this.id = '_' + Math.random().toString(36).substr(2, 9);
         this.stackMap = new Map<Player, number>();
         this.stackSize = stackSize;
@@ -38,6 +44,7 @@ export class PokerGame
             if(this.started == false)
             {
                 this.stackMap.set(player, this.stackSize); 
+                this.totalPlayers++;
             }
             else
             {
@@ -57,6 +64,7 @@ export class PokerGame
             if(this.stackMap.delete(player))
             {
                 console.log("Successfully removed player from game: " + player);
+                this.totalPlayers--;
             }
             else
             {

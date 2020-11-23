@@ -13,11 +13,11 @@ export async function openLobby(req: Request, res: Response, next: NextFunction)
         gameId: game.id })
     }else{
         
-            let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer)
+            let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer, req.body.name, req.body.password)
             pokerGame.addPlayer(new Player(req.body.username))
             games.push(pokerGame)
             const pubsub = Pubsub.getInstance()
-            pubsub.post('newGame', {game: pokerGame})
+            await pubsub.post('newGame', {game: pokerGame})
             res.json({gameId: pokerGame.id})
 
     }
@@ -35,7 +35,10 @@ export async function newPlayer(req: Request, res: Response, next: NextFunction)
         }
     }
     const pubsub = Pubsub.getInstance()
-    pubsub.post(`${req.body.gameId}/pokerLobby`, {username: req.body.username})
+    await pubsub.post(`${req.body.gameId}/pokerLobby`, {
+        username: req.body.username,
+        id: req.body.gameId
+    })
     res.json('success')
 
 }
@@ -47,7 +50,10 @@ export async function kickPlayer(req: Request, res: Response, next: NextFunction
         }
     }
      const pubsub = Pubsub.getInstance()
-     pubsub.post(`${req.body.gameId}/pokerLobbyLeave`, {username: req.body.username})
+     await pubsub.post(`${req.body.gameId}/pokerLobbyLeave`, {
+         username: req.body.username,
+         id: req.body.gameId
+    })
     console.log(game.stackMap)
     let keys :Player[] = Array.from( game.stackMap.keys() );
     for(let i = 0; i < keys.length; i++){
@@ -83,7 +89,7 @@ export async function closeLobby(req: Request, res: Response, next: NextFunction
     let cancelledGame = games.filter(game => game.id !== req.body.gameId)
     games = cancelledGame
     const pubsub = Pubsub.getInstance()
-    pubsub.post('endGame', {id: req.body.gameId})
+    await pubsub.post('endGame', {id: req.body.gameId})
     res.json('success')
 
     
