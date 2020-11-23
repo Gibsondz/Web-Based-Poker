@@ -6,38 +6,37 @@
       color="white"
       elevate-on-scroll
     >
-    <v-btn elevation="0" color="#fff" @click="showSettings = true">
+    <v-btn elevation="0" color="#fff" @click="$emit('account')">
     <v-icon>settings</v-icon>
     <v-toolbar-title>Account</v-toolbar-title>
     </v-btn>
       
-    <v-btn elevation="0" color="#fff" @click="showSettings = false">
+    <v-btn elevation="0" color="#fff" @click="$emit('lobby')">
     <v-toolbar-title>Lobby</v-toolbar-title>
     </v-btn>
+
       <v-spacer></v-spacer>
     </v-app-bar>
   </v-card>
-  <account  v-if="showSettings"></account>
 </div>
 </template>
 <script>
+
+import WaitingRoom from './WaitingRoom'
 import Account from './Account'
 export default {
     components: {
-        Account
+        Account,
+        WaitingRoom
     },
     data() {
         return {
             user: null,
-            showSettings: false
+            showSettings: false,
+            newGame: false
         }
     },   
-    methods:{
-        settingsPage(){
-            this.showSettings = true
-        }
 
-    }
 }
 </script>
 <style scoped>
