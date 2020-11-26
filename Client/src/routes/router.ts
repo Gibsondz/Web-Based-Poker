@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Browse from './browse'
 import Lobby from './lobby'
 import WaitingRoom from './waitingRoom'
+import Game from './game'
 Vue.use(Router)
 const router = new Router({
     mode: 'history',
@@ -10,6 +11,7 @@ const router = new Router({
         Browse,
         Lobby,
         WaitingRoom,
+        Game,
         {
             path: '*',
             redirect: ({ path, query }) => {

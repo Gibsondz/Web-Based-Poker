@@ -77,6 +77,7 @@ export default {
                 })
                 this.host = this.user.username
                 this.gameId = res.data.gameId
+                document.cookie = `gameId=${this.gameId}`
                 if(res.data.message){
                     let res  = await this.$axios.post('/game/fetchPlayers', {
                         gameId: this.gameId
@@ -120,6 +121,7 @@ export default {
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on(`${this.gameId}/pokerLobby`, this.addPlayer)
         this.$ws.on(`${this.gameId}/pokerLobbyLeave`, this.leave)
+        this.$ws.on(`${this.gameId}/pokerLobbyStart`, this.start)
 
 
     }, 
@@ -168,10 +170,19 @@ export default {
 
         },
         async end(){
-            // TODO
+            //TODO
         },
         async start(){
-            // TODO
+            if(this.isHost)
+            {
+                await this.$axios.post('/game/start', {
+                    gameId: this.gameId,
+                }) 
+            }
+            if(this.players.length+1 >= 2 && this.players.length+1 <= 9)
+            {
+               window.location.href = "/game"; 
+            }
         },
         async kickPlayer(username){
             // TODO

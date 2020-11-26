@@ -3,6 +3,7 @@ import { User, } from '../entities'
 import { PokerGame } from '../utils/Engine/PokerGame'
 import {  Player } from '../utils/Engine/Player'
 import { Pubsub } from '../websocket'
+import { GameRender } from '../utils/Engine/GameRender'
 let games : PokerGame[] = [];
 
 export async function openLobby(req: Request, res: Response, next: NextFunction) {
@@ -22,6 +23,55 @@ export async function openLobby(req: Request, res: Response, next: NextFunction)
 
     }
 }
+
+export async function start(req: Request, res: Response, next: NextFunction)
+{
+    let gameid = req.body.gameId;
+    let game = games.find(game => game.id == gameid);
+
+    game.start();
+
+    const pubsub = Pubsub.getInstance()
+    await pubsub.post(`${gameid}/pokerLobbyStart`, {game: game})
+    res.json('success');
+}
+
+export async function getRendering(req: Request, res: Response, next: NextFunction)
+{
+    let gameid = req.body.gameId;
+    let username = req.body.username;
+    let game = games.find(game => game.id == gameid);
+    let gameRender = game.getGameRender();
+    let players = [];
+    
+    for( let [player, handStatus] of gameRender.getHandStatusMap() )
+    {
+        let tempobj = {};
+        tempobj["name"] = player.getName();
+        tempobj["stackSize"] = handStatus.getStackSize();
+        tempobj["betChips"] = handStatus.getBetChips();
+        if(player.getName() === username)
+        {
+            tempobj["holeCards"] = handStatus.getHoleCards();
+        }
+        tempobj["isFolded"] = handStatus.isFolded();
+        tempobj["isAllIn"] = handStatus.isAllIn();
+        players.push(tempobj);
+    }
+
+    res.json({
+        potSize: gameRender.getPotsize(),
+        activePlayer: gameRender.getActivePlayer(),
+        blinds: {
+            smallBlind: gameRender.getBlinds().getSmallBlind(),
+            bigBlind: gameRender.getBlinds().getBigBlind(),
+            blindTimer: gameRender.getBlindTimer()
+        },
+        players: players,
+        board: gameRender.getBoard()
+    });
+}
+
 export async function call(req: Request, res: Response, next: NextFunction) {
 
 
@@ -54,16 +104,23 @@ export async function kickPlayer(req: Request, res: Response, next: NextFunction
          username: req.body.username,
          id: req.body.gameId
     })
-    console.log(game.stackMap)
-    let keys :Player[] = Array.from( game.stackMap.keys() );
-    for(let i = 0; i < keys.length; i++){
-        if(keys[i].name === req.body.username){
-            console.log(keys[i])
-            game.removePlayer(keys[i])
+    if(game != null)
+    {
+        console.log(game.stackMap)
+        let keys :Player[] = Array.from( game.stackMap.keys() );
+        for(let i = 0; i < keys.length; i++){
+            if(keys[i].name === req.body.username){
+                console.log(keys[i])
+                game.removePlayer(keys[i])
 
+            }
         }
+        res.json('Success');
     }
-    res.json('success')
+    else
+    {
+        res.json('Failure');
+    }
 
 }
 export async function fetchPlayers(req: Request, res: Response, next: NextFunction) {
@@ -74,11 +131,16 @@ export async function fetchPlayers(req: Request, res: Response, next: NextFuncti
             game = games[i]
         }
     }
-    let keys = Array.from( game.stackMap.keys() );
-    console.log(keys)
-    res.json(keys)
-
-
+    if(game != null)
+    {
+        let keys = Array.from( game.stackMap.keys() );
+        console.log(keys)
+        res.json(keys)
+    }
+    else
+    {
+        res.json('Failure');
+    }
 }
 export async function fold(req: Request, res: Response, next: NextFunction) {
 

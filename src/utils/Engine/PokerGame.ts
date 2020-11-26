@@ -12,6 +12,7 @@ export class PokerGame
     public totalPlayers: number;
     public stackMap: Map<Player, number>;
     public blindTimer: number;
+    private currentBlindTimer: number;
     private blindLevels: Map<number, Blind>;
     private currentHand: Hand;
     private started: boolean;
@@ -31,6 +32,7 @@ export class PokerGame
         this.stackSize = stackSize;
         this.started = false;
         this.blindTimer = blindTimer;
+        this.currentBlindTimer = blindTimer;
         this.populateBlindLevels();
         this.currentBlindLevel = 1;
         this.bigBlindPointer = 0;
@@ -215,7 +217,7 @@ export class PokerGame
 
     public getGameRender() : GameRender
     {
-        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), this.currentHand.getPots());;
+        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), this.blindLevels.get(this.currentBlindLevel), this.currentBlindTimer, this.currentHand.getBoard());
     }
 
     public isFinished() : boolean

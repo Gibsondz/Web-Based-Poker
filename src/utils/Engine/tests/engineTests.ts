@@ -10,7 +10,7 @@ import { Categories } from '../Categories';
 
 describe('Poker Game Scenerios', () => { //Test container for poker game scenarios
     it('Basic Sample Hand', () => {
-        let game = new PokerGame(3000, 900);
+        let game = new PokerGame("x",3000, 900, "game", "");
         let Bob = new Player("Bob");
         let Bill = new Player("Bill");
         let Clad = new Player("Clad");
@@ -108,7 +108,7 @@ describe('Poker Game Scenerios', () => { //Test container for poker game scenari
     });
 
     it('Hand With Legal Raises/Out of Turn Fold/Won by flop fold', () => {
-        let game = new PokerGame(3000, 900);
+        let game = new PokerGame("x",3000, 900, "game", "");
         let Bob = new Player("Bob");
         let Bill = new Player("Bill");
         let Clad = new Player("Clad");
@@ -199,7 +199,7 @@ describe('Poker Game Scenerios', () => { //Test container for poker game scenari
     });
 
     it('Side Pots Test', () => {
-        let game = new PokerGame(3000, 900);
+        let game = new PokerGame("x",3000, 900, "game", "");
         let Bob = new Player("Bob");
         let Bill = new Player("Bill");
         let Clad = new Player("Clad");
@@ -323,7 +323,7 @@ describe('Poker Game Scenerios', () => { //Test container for poker game scenari
     });
 
     it('Heads up hand test', () => {
-        let game = new PokerGame(3000, 900);
+        let game = new PokerGame("x",3000, 900, "game", "");
         let Bob = new Player("Bob");
         let Bill = new Player("Bill");
         game.addPlayer(Bob);
@@ -352,7 +352,7 @@ describe('Poker Game Scenerios', () => { //Test container for poker game scenari
 
 describe('Test Declare Winner Functionality', () => {
     it('Test getCategoryIndex function', () => {
-        let pokerGame = new PokerGame(3000,900);
+        let pokerGame = new PokerGame("x",3000, 900, "game", "");
         let Bob = new Player("Bob");
         let John = new Player("John");
         pokerGame.addPlayer(Bob);
