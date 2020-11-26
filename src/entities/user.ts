@@ -7,13 +7,13 @@ export class User extends EntityBase {
     @Column()
     id: string
 
-    @Column()
+    @Column({ unique: true })
     username: string
 
     @Column({ unique: true, nullable: true })
     email: string
 
-    @Column({ unique: true, nullable: true })
+    @Column()
     password: string
     
 

@@ -21,16 +21,21 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 }
 export async function signUp(req: Request, res: Response, next: NextFunction) {
-    let ID = '_' + Math.random().toString(36).substr(2, 9);
+    try{
+        let ID = '_' + Math.random().toString(36).substr(2, 9);
     
-    console.log(ID)
-    let user = new User()
-    user.id = ID
-    user.username = req.body.username
-    user.email = req.body.email
-    user.password = req.body.password
-    user.save()
-    res.json(user)
+        console.log(ID)
+        let user = new User()
+        user.id = ID
+        user.username = req.body.username
+        user.email = req.body.email
+        user.password = req.body.password
+        await user.save()
+        res.json(user)
+    }
+    catch(err){
+        res.json({message: 'already exsists'})
+    }
 
 
 // let users = await User.query("DROP TABLE[user]")

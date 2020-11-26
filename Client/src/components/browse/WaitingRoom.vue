@@ -9,7 +9,7 @@
             </div>
             <div class="player" v-for="player in players" v-bind:key="player.username">
                 <h3> {{ player.username }} </h3>
-                <v-btn class="kickButton" primary small inline @click="kickPlayer(player.username)">Kick</v-btn>
+                <v-btn v-if="isHost" class="kickButton" primary small inline @click="kickPlayer(player.username)">Kick</v-btn>
             </div>
         </div>
         <div>
@@ -19,7 +19,7 @@
                 <p>Starting Blinds: {{gameData.startingBlinds}}</p>
             </div>
             <div class='gameButtons' v-if="!isHost">
-                <v-btn class="leaveButton" primary large inline @click="leave">Leave</v-btn>
+                <v-btn class="leaveButton" primary large inline @click="end">Leave</v-btn>
             </div>
             <div class='gameButtons' v-if="isHost">
                 <v-btn class="endButton" primary large inline @click="end">End</v-btn>
@@ -77,7 +77,14 @@ export default {
                 })
                 this.host = this.user.username
                 this.gameId = res.data.gameId
-                if(res.data.message){
+                document.cookie = `gameId=${this.gameId}`
+                let message = res.data.message
+                let started = res.data.isStarted
+                if(message){
+                    console.log("started: ",started)
+                   if(started){
+                       window.location.href='/game'
+                   }
                     let res  = await this.$axios.post('/game/fetchPlayers', {
                         gameId: this.gameId
                     })
@@ -85,7 +92,7 @@ export default {
                     let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
                     this.gameData.blindTimer = Number(timer)
 
-                    let players = res.data
+                    let players = res.data.players
                     for(let i = 0; i < players.length; i++){
                         if(players[i].name !== this.host){
                             this.players.push({username: players[i].name})
@@ -99,7 +106,8 @@ export default {
                  let res  = await this.$axios.post('/game/fetchPlayers', {
                         gameId: this.gameId
                     })
-                let players = res.data
+                let players = res.data.players
+                let started  = res.data.isStarted
             if(!players.find(me => me.name === this.user.username)){
                 let res  = await this.$axios.post('/game/newPlayer', {
                         username: this.user.username,
@@ -107,6 +115,8 @@ export default {
                     })
                 this.players.push({username: this.user.username})
                     
+            }else if(started){
+                window.location.href='/game'
             }
              let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
             this.gameData.blindTimer = Number(timer)
@@ -120,6 +130,10 @@ export default {
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on(`${this.gameId}/pokerLobby`, this.addPlayer)
         this.$ws.on(`${this.gameId}/pokerLobbyLeave`, this.leave)
+        this.$ws.on(`${this.gameId}/pokerLobbyStart`, this.start)
+        this.$ws.on(`${this.gameId}/pokerLobbyEnd`, this.end)
+        this.$ws.on(`${this.user.username}/kicked`, this.end)
+
 
 
     }, 
@@ -151,30 +165,23 @@ export default {
                 
             }
         },
-        async someMethod(e){
-        if(this.isHost){
-            await this.$axios.post('/game/closeLobby', {
-                gameId: this.gameId
-            })
-        }else{
-             await this.$axios.post('/game/kickPlayer', {
-                gameId: this.gameId,
-                username: this.user.username
-            })
-
-        }
-        return
-        
-
-        },
         async end(){
-            // TODO
+            this.$emit('game-ended')
         },
         async start(){
-            // TODO
+            if(this.isHost){
+                await this.$axios.post('/game/start', {
+                   gameId: this.gameId,
+               })
+            }
+            document.cookie = 'tab=lobby'
+            window.location.href='/game'
         },
         async kickPlayer(username){
-            // TODO
+            await this.$axios.post('/game/kickPlayer', {
+                gameId: this.gameId,
+                username: username
+            })
         }
     }
 }

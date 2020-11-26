@@ -23,6 +23,24 @@
                     </v-container>
             </v-layout>
         </div>
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="3000"
+            :top="true"
+            >
+            That username or email already exsists
+
+            <template v-slot:action="{ attrs }">
+                <v-btn
+                color="pink"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+                >
+                Close
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 <script>
@@ -34,7 +52,8 @@ export default {
             user: null,
             username: '',
             password: '',
-            email: ''
+            email: '',
+            snackbar: false
         }
     },
     async created() {
@@ -49,9 +68,13 @@ export default {
                 email: this.email
             })
             console.log(res)
-            document.cookie = 'place=pokergame'
-            document.cookie = `name=${res.data.id}`
-            this.$emit('success')
+            if(res.data.message){
+                this.snackbar = true
+            }else{
+                document.cookie = 'place=pokergame'
+                document.cookie = `name=${res.data.id}`
+                this.$emit('success')   
+            }
         }
 
     }
