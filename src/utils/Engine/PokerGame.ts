@@ -15,7 +15,7 @@ export class PokerGame
     private currentBlindTimer: number;
     private blindLevels: Map<number, Blind>;
     private currentHand: Hand;
-    private started: boolean;
+    public started: boolean;
     private stackSize: number;
     private currentBlindLevel: number;
     private bigBlindPointer: number;

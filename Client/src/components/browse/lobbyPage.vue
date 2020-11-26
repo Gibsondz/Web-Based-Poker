@@ -4,7 +4,7 @@
     <div style = "position:relative; top:80px;">
         <lobby @new-game="newGame" @join-game="join" v-if="showLobby"></lobby>
         <account v-if="showAccount"></account>
-        <waiting-room v-if="showNewGame" :blindTimer="blindTimer" :name="name" :password="password" :isHost="isHost" :pokerGameId="gameId" :pokerGameHost="host"></waiting-room>
+        <waiting-room v-if="showNewGame" :blindTimer="blindTimer" :name="name" :password="password" :isHost="isHost" :pokerGameId="gameId" :pokerGameHost="host" @game-ended="Lobby"></waiting-room>
     </div>
 </div>
 </template>

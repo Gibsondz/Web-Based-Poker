@@ -11,7 +11,9 @@ export async function openLobby(req: Request, res: Response, next: NextFunction)
     if(game){
         res.json({
         message: 'exsists', 
-        gameId: game.id })
+        gameId: game.id,
+        isStarted: game.started
+     })
     }else{
         
             let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer, req.body.name, req.body.password)
@@ -74,7 +76,6 @@ export async function getRendering(req: Request, res: Response, next: NextFuncti
 
 export async function call(req: Request, res: Response, next: NextFunction) {
 
-
 }
 export async function newPlayer(req: Request, res: Response, next: NextFunction) {
     let game = null
@@ -93,33 +94,37 @@ export async function newPlayer(req: Request, res: Response, next: NextFunction)
 
 }
 export async function kickPlayer(req: Request, res: Response, next: NextFunction) {
-    let game = null
-    for(let i = 0; i < games.length; i++){
-        if(games[i].id === req.body.gameId){
-            game = games[i]
-        }
-    }
-     const pubsub = Pubsub.getInstance()
-     await pubsub.post(`${req.body.gameId}/pokerLobbyLeave`, {
-         username: req.body.username,
-         id: req.body.gameId
-    })
-    if(game != null)
-    {
-        console.log(game.stackMap)
-        let keys :Player[] = Array.from( game.stackMap.keys() );
-        for(let i = 0; i < keys.length; i++){
-            if(keys[i].name === req.body.username){
-                console.log(keys[i])
-                game.removePlayer(keys[i])
-
+    try{
+        let game = null
+        for(let i = 0; i < games.length; i++){
+            if(games[i].id === req.body.gameId){
+                game = games[i]
             }
         }
-        res.json('Success');
-    }
-    else
-    {
-        res.json('Failure');
+         const pubsub = Pubsub.getInstance()
+         await pubsub.post(`${req.body.gameId}/pokerLobbyLeave`, {
+             username: req.body.username,
+             id: req.body.gameId
+        })
+        await pubsub.post(`${req.body.username}/kicked`, 'success')
+        if(game != null)
+        {
+            let keys :Player[] = Array.from( game.stackMap.keys() );
+            for(let i = 0; i < keys.length; i++){
+                if(keys[i].name === req.body.username){
+                    console.log(keys[i])
+                    game.removePlayer(keys[i])
+                }
+            }
+            res.json('success')
+        }
+        else
+        {
+            res.json('failure')
+        }
+
+    }catch(err){
+        res.json('already gone')
     }
 
 }
@@ -135,11 +140,14 @@ export async function fetchPlayers(req: Request, res: Response, next: NextFuncti
     {
         let keys = Array.from( game.stackMap.keys() );
         console.log(keys)
-        res.json(keys)
+        res.json({
+            players: keys,
+            isStarted: game.started
+        })
     }
     else
     {
-        res.json('Failure');
+        res.json('failure');
     }
 }
 export async function fold(req: Request, res: Response, next: NextFunction) {
@@ -152,10 +160,12 @@ export async function closeLobby(req: Request, res: Response, next: NextFunction
     games = cancelledGame
     const pubsub = Pubsub.getInstance()
     await pubsub.post('endGame', {id: req.body.gameId})
+    await pubsub.post(`${req.body.gameId}/pokerLobbyEnd`, {id: req.body.gameId})
     res.json('success')
 
     
 }
 export async function fetchGames(req: Request, res: Response, next: NextFunction) {
-    res.json(games)
+    let notStartedGames = games.filter(game=> game.started === false)
+    res.json(notStartedGames)
 }
