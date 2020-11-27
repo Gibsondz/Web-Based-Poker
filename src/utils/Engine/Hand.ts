@@ -368,7 +368,7 @@ export class Hand{
     {
         if(this.circularHandStatusMap.getActivePlayer().equals(player))
         {
-            if(this.circularHandStatusMap.getHighestBet() == 0)
+            if(this.circularHandStatusMap.getHighestBet() == 0 && amount != 0)
             {
                 this.circularHandStatusMap.bet(amount);
                 this.circularHandStatusMap.next();
