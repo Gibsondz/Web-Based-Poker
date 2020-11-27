@@ -52,4 +52,9 @@ export class GameRender
     {
         return this.board;
     }
+
+    public isBetOut(): boolean
+    {
+        return this.circularHandStatusMap.getHighestBet() != 0;
+    }
 }

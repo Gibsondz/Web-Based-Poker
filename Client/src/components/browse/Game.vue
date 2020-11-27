@@ -4,10 +4,17 @@
             <div class='center'>
                 {{this.gameRendering}}
             </div>
-            <div class='gameButtons' v-if="isActivePlayer">
+            <div class='gameButtons' v-if="isActivePlayer && isBetOut">
+                <v-text-field v-model="numberData" label="Enter Amount"></v-text-field>
+                <v-btn class="gameButton" primary large inline @click="bet">Raise</v-btn>
+                <v-btn class="gameButton" primary large inline @click="call">Call</v-btn>
                 <v-btn class="gameButton" primary large inline @click="fold">Fold</v-btn>
+            </div>
+            <div class='gameButtons' v-if="isActivePlayer && !isBetOut">
+                <v-text-field v-model="numberData" label="Enter Amount"></v-text-field>
+                <v-btn class="gameButton" primary large inline @click="bet">Bet</v-btn>
                 <v-btn class="gameButton" primary large inline @click="check">Check</v-btn>
-                <v-btn class="gameButton" primary large inline @click="raise">Raise</v-btn>
+                <v-btn class="gameButton" primary large inline @click="fold">Fold</v-btn>
             </div>
         </div>
     </v-container>
@@ -23,7 +30,9 @@ export default {
             user: null, 
             gameId: '',
             gameRendering: null,
-            isActivePlayer: false
+            isActivePlayer: false,
+            isBetOut: false,
+            numberData: 0,
         }
     },
     async created() {
@@ -49,29 +58,38 @@ export default {
     methods:{
         async requestRendering(){
             let res = await this.$axios.post('/game/getRendering', {
-            gameId: this.gameId,
-            username: this.user.username,
+                gameId: this.gameId,
+                username: this.user.username,
             })
             this.gameRendering = res;
-            console.log(res);
-            console.log(res.data.activePlayer.name);
-            if(res.data.activePlayer.name === this.user.username)
-            {
-                this.isActivePlayer = true;
-            } 
-            else
-            {
-                console.log("We here");
-                this.isActivePlayer = false;
-            }
+            
+            this.isActivePlayer = res.data.activePlayer.name === this.user.username;
+            this.isBetOut = res.data.isBetOut;
         },
         async fold(){
+            let res = await this.$axios.post('/game/fold', {
+                gameId: this.gameId,
+                username: this.user.username,
+            })
         },
         async check(){
+            let res = await this.$axios.post('/game/check', {
+                gameId: this.gameId,
+                username: this.user.username,
+            })
         },
-        async raise(){
+        async bet(){
+            let res = await this.$axios.post('/game/bet', {
+                gameId: this.gameId,
+                username: this.user.username,
+                amount: parseInt(this.numberData, 10)
+            })
         },
         async call(){
+            let res = await this.$axios.post('/game/call', {
+                gameId: this.gameId,
+                username: this.user.username,
+            })
         },
     }
 }
