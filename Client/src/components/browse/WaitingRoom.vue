@@ -64,6 +64,9 @@ export default {
         let res  = await this.$axios.post('/users/getUser', {
         id: id,
         })
+
+        let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
+        this.gameData.blindTimer = Number(timer)
         
         this.user = res.data.user
         console.log(this.isHost)
@@ -88,9 +91,6 @@ export default {
                     let res  = await this.$axios.post('/game/fetchPlayers', {
                         gameId: this.gameId
                     })
-                    let allCookies = document.cookie
-                    let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
-                    this.gameData.blindTimer = Number(timer)
 
                     let players = res.data.players
                     for(let i = 0; i < players.length; i++){
@@ -118,7 +118,7 @@ export default {
             }else if(started){
                 window.location.href='/game'
             }
-             let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
+            let timer = allCookies.split('; ').find(row => row.startsWith('timer')).split('=')[1]
             this.gameData.blindTimer = Number(timer)
             for(let i = 0; i < players.length; i++){
                     if(players[i].name !== this.host){
@@ -169,13 +169,17 @@ export default {
             this.$emit('game-ended')
         },
         async start(){
-            if(this.isHost){
+            if(this.isHost)
+            {
                 await this.$axios.post('/game/start', {
-                   gameId: this.gameId,
-               })
+                    gameId: this.gameId,
+                }) 
             }
-            document.cookie = 'tab=lobby'
-            window.location.href='/game'
+            if(this.players.length+1 >= 2 && this.players.length+1 <= 9)
+            {
+               document.cookie = 'tab=lobby'
+               window.location.href = "/game"; 
+            }
         },
         async kickPlayer(username){
             await this.$axios.post('/game/kickPlayer', {

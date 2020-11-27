@@ -15,6 +15,8 @@ export class Hand{
     private deck: Deck;
     private board: Array<Card>;
     private smallBlindPosition: number;
+    private bigBlindPosition: number;
+    private bigBlindSize: number;
 
     readonly PREFLOP_STAGE= 0;
     readonly FLOP_STAGE = 1;
@@ -70,6 +72,8 @@ export class Hand{
         this.circularHandStatusMap = new CircularHandStatusMap(handStatusMap, initialActionPointer);
         this.dealCards();
         this.handStage = this.PREFLOP_STAGE;
+        this.bigBlindPosition = bigBlindPosition;
+        this.bigBlindSize = blinds.getBigBlind();
     }
 
     private dealCards()
@@ -129,7 +133,7 @@ export class Hand{
             this.nextHandStage(true);
             return;
         }
-        else if(this.everyoneChecked() || this.highestBetMatched())
+        else if((this.everyoneChecked() || this.highestBetMatched()) && this.preFlopBigBlindDidAction())
         {
             this.calculatePots();
             this.nextHandStage(false);
@@ -493,5 +497,25 @@ export class Hand{
     public getBoard() : Array<Card>
     {
         return this.board;
+    }
+
+    private preFlopBigBlindDidAction() : boolean
+    {
+        if(this.handStage != this.PREFLOP_STAGE)
+        {
+            return true;
+        }
+        else //We are preflop. Hand can't move onto next stage until the big blind acted at some point.
+        {
+            let handStatus = Array.from(this.circularHandStatusMap.getHandStatusMap().values())[this.bigBlindPosition];
+            if( !handStatus.isChecked() && !handStatus.isFolded() && handStatus.getBetChips() == this.bigBlindSize)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

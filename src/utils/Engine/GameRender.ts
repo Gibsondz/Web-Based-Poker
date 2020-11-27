@@ -1,21 +1,26 @@
 import { CircularHandStatusMap } from "./CircularHandStatusMap";
 import { HandStatus } from "./HandStatus";
 import { Player } from "./Player";
-import { Pot } from "./Pot";
+import { Blind } from "./Blind";
+import { Card } from "./Card";
 
 export class GameRender
 {
     private potsize: number;
     private circularHandStatusMap: CircularHandStatusMap
     private activePlayer: Player
-    private pots : Array<Pot>;
+    private blinds: Blind
+    private blindTimer: number;
+    private board: Array<Card>;
 
-    constructor( pot : number, map : CircularHandStatusMap, pots : Array<Pot>)
+    constructor( pot : number, map : CircularHandStatusMap, blinds: Blind, blindTimer: number, board : Array<Card>)
     {
         this.potsize = pot;
         this.circularHandStatusMap = map;
         this.activePlayer = this.circularHandStatusMap.getActivePlayer();
-        this.pots = pots;
+        this.blinds = blinds;
+        this.blindTimer = blindTimer;
+        this.board = board;
     }
 
     public getPotsize()
@@ -33,8 +38,23 @@ export class GameRender
         return this.activePlayer;
     }
 
-    public getPots()
+    public getBlinds(): Blind
     {
-        return this.pots;
+        return this.blinds;
+    }
+
+    public getBlindTimer(): number
+    {
+        return this.blindTimer;
+    }
+
+    public getBoard(): Array<Card>
+    {
+        return this.board;
+    }
+
+    public isBetOut(): boolean
+    {
+        return this.circularHandStatusMap.getHighestBet() != 0;
     }
 }
