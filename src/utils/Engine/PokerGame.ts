@@ -110,7 +110,7 @@ export class PokerGame
                 this.currentBlindLevel++;
                 this.currentBlindTimer = this.blindTimer;
             }
-        }, 1000);
+        }, 60000);
     }
 
     public call(player: Player)

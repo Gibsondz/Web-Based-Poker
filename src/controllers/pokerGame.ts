@@ -15,8 +15,7 @@ export async function openLobby(req: Request, res: Response, next: NextFunction)
         isStarted: game.started
      })
     }else{
-            let blindTimerSeconds = req.body.blindTimer * 60;
-            let pokerGame = new PokerGame(req.body.username, req.body.stackSize, blindTimerSeconds, req.body.name, req.body.password)
+            let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer, req.body.name, req.body.password)
             pokerGame.addPlayer(new Player(req.body.username))
             games.push(pokerGame)
             const pubsub = Pubsub.getInstance()
