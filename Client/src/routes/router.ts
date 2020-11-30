@@ -4,6 +4,7 @@ import Browse from './browse'
 import Lobby from './lobby'
 import WaitingRoom from './waitingRoom'
 import Game from './game'
+import AdminPage from './adminPage'
 Vue.use(Router)
 const router = new Router({
     mode: 'history',
@@ -12,6 +13,7 @@ const router = new Router({
         Lobby,
         WaitingRoom,
         Game,
+        AdminPage,
         {
             path: '*',
             redirect: ({ path, query }) => {
