@@ -3,13 +3,13 @@
         <h1 class="title">Manage Users</h1>
         <div class="userOptions" v-for="(user, i) in users" v-bind:key="user.username">
             <div>
-                <b-btn v-b-toggle="'collapse-' + i" variant="primary">
-                    <span class="when-closed">+ </span>
-                    <span class="when-opened">- </span>
-                    {{ user.username }}
+                <b-btn class="userCollapseButton" v-b-toggle="'collapse-' + i" variant="primary">
+                    <img class="closedIcon" src="@/assets/Resources/icons/arrow_forward-24px.svg" alt="">
+                    <img class="openIcon" src="@/assets/Resources/icons/arrow_downward-24px.svg" alt="">
+                    <span class="userNameLabel"> {{ user.username }}  </span>
+                    <span v-if="user.isAdmin" class="userType"> Admin </span>
+                    <span v-if="!user.isAdmin" class="userType"> Standard </span>
                 </b-btn>
-                <span v-if="user.isAdmin" class="userType"> Admin </span>
-                <span v-if="!user.isAdmin" class="userType"> Standard </span>
             </div>
             <b-collapse :id="'collapse-' + i" class="mt-2">
                 <b-card>
@@ -98,10 +98,20 @@ export default {
     background: lightgray;
     border-width: 2px;
 }
+.userCollapseButton{
+    width: 100%;
+}
+.userCollapseButton img{
+    float: left;
+    margin-top: 8px;
+}
+.userNameLabel{
+    float: left;
+    padding-left: 10px;
+}
 .userType{
     float: right;
 }
-
 .userInputs span{
     font-size: 18px;
 }
@@ -137,8 +147,8 @@ export default {
     margin-top: 20px;
 }
 
-.collapsed > .when-opened,
-:not(.collapsed) > .when-closed {
+.collapsed > .openIcon,
+:not(.collapsed) > .closedIcon {
   display: none;
 }
 </style>
