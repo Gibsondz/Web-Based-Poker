@@ -7,6 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "bootstrap": "^4.5.3",
+    "bootstrap-vue": "^2.20.0",
     "chart.js": "2.8.0",
     "core-js": "2.6.5",
     "crypto-js": "3.1.9-1",
@@ -14,7 +16,7 @@
     "random-text-generator": "^3.0.1",
     "three": "^0.107.0",
     "v-infinite-scroll": "^1.0.4",
-    "vue": "2.6.10",
+    "vue": "^2.6.10",
     "vue-class-component": "7.0.2",
     "vue-draggable-resizable": "^2.2.0",
     "vue-moveable": "^1.8.2",
