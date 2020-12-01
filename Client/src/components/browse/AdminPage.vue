@@ -1,21 +1,33 @@
 <template>
     <v-container class="container">
-        <h1>Manage Users</h1>
-
-        <div class="user" v-for="(user, i) in users" v-bind:key="user.username">
+        <h1 class="title">Manage Users</h1>
+        <div class="userOptions" v-for="(user, i) in users" v-bind:key="user.username">
             <div>
-                <b-button v-b-toggle="'collapse-' + i" variant="primary">{{ user.username }}</b-button>
-                <p> {{ user.userType }} </p>
+                <b-btn v-b-toggle="'collapse-' + i" variant="primary">
+                    <span class="when-closed">+ </span>
+                    <span class="when-opened">- </span>
+                    {{ user.username }}
+                </b-btn>
+                <span v-if="user.isAdmin" class="userType"> Admin </span>
+                <span v-if="!user.isAdmin" class="userType"> Standard </span>
             </div>
             <b-collapse :id="'collapse-' + i" class="mt-2">
                 <b-card>
-                    <div>
-                        <p> Change Password </p>
-                        <v-text-field v-model="pwChanges[i]" label="Username"></v-text-field>
-                        <v-btn primary small block @click="changePassword(user.username, i)">Change Password</v-btn>
-                        <v-btn primary small block @click="makeAdmin(user.username)">Admin</v-btn>
-                        <v-btn primary small block @click="makeStandard(user.username)">Standard</v-btn>
-                        <v-btn primary large block @click="removeUser(user.username)">Remove User</v-btn>
+                    <div class="userInputs">
+                        <span>Change Password: &nbsp;&nbsp;</span>
+                        <v-text-field class="passwordField" v-model="pwChanges[i]" label="Password" type="password"></v-text-field>
+                        <div></div>
+                        <span class="passwordLabel">Confirm Password: </span>
+                        <v-text-field class="passwordField" v-model="confirmPwChanges[i]" label="Password" type="password"></v-text-field>
+                        <v-btn class="changePasswordButton" primary medium inline @click="changePassword(user.username, i)">Change Password</v-btn>
+                        <div class="userTypeInputs">
+                            <span class="changeUserTypeLabel">Change User Type: </span>
+                            <v-btn class="userTypeButton" primary medium inline @click="makeAdmin(user.username)">Make Admin</v-btn>
+                            <v-btn class="userTypeButton" primary medium inline @click="makeStandard(user.username)">Make Standard</v-btn>
+                        </div>
+                        <div class="deactivateUser">
+                            <v-btn class="deactivateUserButton" large inline @click="deactivateUser(user.username)">Deactivate User</v-btn>
+                        </div>
                     </div>
                 </b-card>
             </b-collapse>
@@ -35,14 +47,15 @@ export default {
             email: '',
 
             users: [
-                {username: "bobby", userType:"admin"},
-                {username: "robby", userType:"standard"},
-                {username: "bob", userType:"admin"},
-                {username: "coolguy", userType:"standard"},
-                {username: "eaeeee", userType:"standard"}
+                {username: "bobby", isAdmin:true},
+                {username: "robby", isAdmin:false},
+                {username: "bob", isAdmin:true},
+                {username: "coolguy", isAdmin:false},
+                {username: "eaeeee", isAdmin:false}
             ],
 
             pwChanges: {},
+            confirmPwChanges: {},
         }
     },
     async created() {
@@ -51,9 +64,7 @@ export default {
         async changePassword(username, i) {
             console.log(username);
             console.log(this.pwChanges[i]);
-            if(confirm("Are you sure?")){
-
-            }
+            console.log(this.confirmPwChanges[i]);
         },
         async makeAdmin(username) {
             console.log(username);
@@ -61,7 +72,7 @@ export default {
         async makeStandard(username) {
             console.log(username);
         },
-        async removeUser(username) {
+        async deactivateUser(username) {
             console.log(username);
             if(confirm("Are you sure?")){
 
@@ -71,5 +82,63 @@ export default {
 }
 </script>
 <style scoped>
+.title{
+    padding-bottom: 20px;
+}
+.userOptions{
+    font-size: 30px;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    border-color: black;
+    border-style: solid;
+    border-radius: 10px;
+    background: lightgray;
+    border-width: 2px;
+}
+.userType{
+    float: right;
+}
 
+.userInputs span{
+    font-size: 18px;
+}
+
+.passwordField{
+    width: 50%;
+    display: inline-block;
+}
+.passwordButton{
+    display: inline-block;
+    width: 50px;
+}
+.changePasswordButton{
+    float: right;
+    margin-top: 20px;
+}
+.removeUserButton{
+    padding: 100px;
+}
+.userTypeInputs{
+    padding-bottom: 20px;
+}
+.userTypeInputs button{
+    float: right;
+    margin-top: 10px;
+}
+.deactivateUser{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+.deactivateUser button{
+    margin-top: 20px;
+}
+
+.collapsed > .when-opened,
+:not(.collapsed) > .when-closed {
+  display: none;
+}
 </style>
