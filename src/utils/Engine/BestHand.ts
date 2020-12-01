@@ -25,6 +25,14 @@ export class BestHand
         {categoryName:Categories.FH, rank:6},
     ];
 
+    public setBoard(newBoard) {
+        this.finalBoard = newBoard;
+    }
+
+    public setHandStatusMap(newMap) {
+        this.handStatusMap = newMap;
+    }
+
     constructor(handStatusMap: Map<Player, HandStatus>,board: Array<Card>) {
         if (board.length !== 5) {
             console.log("Failed to initialize Best Hand: expected full board of 5 but received:", board);
@@ -60,20 +68,18 @@ export class BestHand
         }
         //compare ranks of best hands, majority of cases can be resolved this way
         bestHands.sort((a, b) => {
-            console.log(a, b);
             return b[b.length-1].rank - a[a.length-1].rank;
         });
         bestHands = bestHands.filter((hand, index) => {
             if (index === 0) return true;
             return hand[hand.length-1] === bestHands[0][hand.length-1];
         });
-        console.log("bestHands:",bestHands);
         if (bestHands.length === 1) {
             return bestHands;
         }
         //edge cases when rank matches for best hand, can still be outright winner OR split in this case
         //high card, straight, flush and straight-flush edge case check-who has the largest card? Straightforward since already sorted, so just compare first element in card array(bestHands[i][1][0]):
-        if (bestHands[0][2].categoryName === (Categories.HC || Categories.ST || Categories.FL || Categories.SF)) {
+        if ([Categories.HC, Categories.ST, Categories.FL, Categories.SF].includes(bestHands[0][2].categoryName)) {
             let largestHands = [bestHands[0]];
             let maxValue = bestHands[0][1][0].getValue();
             for (let i = 1; i < bestHands.length; i++) {
@@ -103,16 +109,35 @@ export class BestHand
                 else if (pairVal === player_maxPair[1]) {
                     //need to check next highest card
                     let bestIdx = player_maxPair[0];
-                    let challengingHC = bestHands[i][1][0] === pairVal ? bestHands[i][1][2] : bestHands[i][1][0];
-                    let currentHC = bestHands[bestIdx][1][0] === player_maxPair[1] ? bestHands[bestIdx][1][2] : bestHands[bestIdx][1][0];
-                    if (challengingHC > currentHC) {
+                    let challengingHC = bestHands[i][1][0].getValue() === pairVal ? bestHands[i][1][2] : bestHands[i][1][0];
+                    let currentHC = bestHands[bestIdx][1][0].getValue() === pairVal ? bestHands[bestIdx][1][2] : bestHands[bestIdx][1][0];
+                    if (challengingHC.getValue() > currentHC.getValue()) {
                         player_maxPair[0] = i;
                         largestHands = [];
                         largestHands.push(bestHands[i]);
                     }
-                    else if (challengingHC === currentHC) {
-                        //TODO: need to check next card and potentially final card
-                        largestHands.push(bestHands[i]);
+                    else if (challengingHC.getValue() === currentHC.getValue()) {
+                        //check second to last card
+                        challengingHC = bestHands[i][1][3].getValue() === pairVal ? bestHands[i][1][2].getValue() === pairVal ? bestHands[i][1][1] : bestHands[i][1][2] : bestHands[i][1][3];
+                        currentHC = bestHands[bestIdx][1][3].getValue() === pairVal ? bestHands[bestIdx][1][2].getValue() === pairVal ? bestHands[bestIdx][1][1] : bestHands[bestIdx][1][2] : bestHands[bestIdx][1][3];
+                        if (challengingHC.getValue() > currentHC.getValue()) {
+                            player_maxPair[0] = i;
+                            largestHands = [];
+                            largestHands.push(bestHands[i]);
+                        }
+                        else if (challengingHC.getValue() === currentHC.getValue()) {
+                            //check final card next
+                            challengingHC = bestHands[i][1][4].getValue() === pairVal ? bestHands[i][1][2] : bestHands[i][1][4];
+                            currentHC = bestHands[bestIdx][1][4].getValue() === pairVal ? bestHands[bestIdx][1][2] : bestHands[bestIdx][1][4];
+                            if (challengingHC.getValue() > currentHC.getValue()) {
+                                player_maxPair[0] = i;
+                                largestHands = [];
+                                largestHands.push(bestHands[i]);
+                            }
+                            else if (challengingHC.getValue() === currentHC.getValue()) {
+                                largestHands.push(bestHands[i]);
+                            }
+                        }
                     }
                 }
             }
@@ -158,40 +183,44 @@ export class BestHand
 
         //3 of a kind & 4 of a kind check
         //intuition: middle card will always be part of the 3/4 of a kind since sorted
-        if (bestHands[0][2].categoryName === (Categories.TK || Categories.FK)) {
+        if ([Categories.TK, Categories.FK].includes(bestHands[0][2].categoryName)) {
             let largestHands = [bestHands[0]];
-            let player_maxPair = [0,bestHands[0][1][2]];
+            let player_maxPair = [0,bestHands[0][1][2].getValue()];
             for (let i = 1; i < bestHands.length; i++) {
-                if (bestHands[i][1][2] > player_maxPair[1]) {
-                    player_maxPair = [i,bestHands[i][1][2]];
+                if (bestHands[i][1][2].getValue() > player_maxPair[1]) {
+                    player_maxPair = [i,bestHands[i][1][2].getValue()];
                     largestHands = [];
                     largestHands.push(bestHands[i]);
                 }
-                else if (bestHands[i][1][2] === player_maxPair[1]) {
+                else if (bestHands[i][1][2].getValue() === player_maxPair[1]) {
                     //need to check next highest card
                     let bestIdx = player_maxPair[0];
                     let challengingHC;
                     let currentHC;
                     if (bestHands[0][2].categoryName === Categories.FK) {
-                        challengingHC = bestHands[i][1][0] === bestHands[i][1][2] ? bestHands[i][1][4] : bestHands[i][1][0];
-                        currentHC = bestHands[bestIdx][1][0] === player_maxPair[1] ? bestHands[bestIdx][1][4] : bestHands[bestIdx][1][0];
+                        challengingHC = bestHands[i][1][0].getValue() === player_maxPair[1] ? bestHands[i][1][4] : bestHands[i][1][0];
+                        currentHC = bestHands[bestIdx][1][0].getValue() === player_maxPair[1] ? bestHands[bestIdx][1][4] : bestHands[bestIdx][1][0];
                     }
                     else {
-                        challengingHC = bestHands[i][1][0] === bestHands[i][1][2] ? (
-                            bestHands[i][1][1] === bestHands[i][1][2] ? bestHands[i][1][3] : bestHands[i][1][1]
-                        ) : bestHands[i][1][0];
-                        currentHC = bestHands[bestIdx][1][0] === player_maxPair[1] ? (
-                            bestHands[bestIdx][1][1] === player_maxPair[1] ? bestHands[bestIdx][1][3] : bestHands[bestIdx][1][1]
-                        ) : bestHands[bestIdx][1][0];
+                        challengingHC = bestHands[i][1][0].getValue() === player_maxPair[1] ? bestHands[i][1][3] : bestHands[i][1][0];
+                        currentHC = bestHands[bestIdx][1][0].getValue() === player_maxPair[1] ? bestHands[bestIdx][1][3] : bestHands[bestIdx][1][0];
                     }
-                    if (challengingHC > currentHC) {
+                    if (challengingHC.getValue() > currentHC.getValue()) {
                         player_maxPair[0] = i;
                         largestHands = [];
                         largestHands.push(bestHands[i]);
                     }
-                    else if (challengingHC === currentHC) {
-                        //TODO for 3k need to check final card
-                        largestHands.push(bestHands[i]);
+                    else if (challengingHC.getValue() === currentHC.getValue()) {
+                        challengingHC = bestHands[i][1][4].getValue() === player_maxPair[1] ? bestHands[i][1][1] : bestHands[i][1][4];
+                        currentHC = bestHands[bestIdx][1][4].getValue() === player_maxPair[1] ? bestHands[bestIdx][1][1] : bestHands[bestIdx][1][4];
+                        if (challengingHC.getValue() > currentHC.getValue()) {
+                            player_maxPair[0] = i;
+                            largestHands = [];
+                            largestHands.push(bestHands[i]);
+                        }
+                        else if (challengingHC.getValue() === currentHC.getValue()) {
+                            largestHands.push(bestHands[i]);
+                        }
                     }
                 }
             }
@@ -201,21 +230,21 @@ export class BestHand
         if (bestHands[0][2].categoryName === Categories.FH) {
             let largestHands = [bestHands[0]];
             let tripsIdx = this.getTripsIndex(bestHands[0][1]);
-            let plr_maxtPairVal = [0, bestHands[0][1][tripsIdx]];
+            let plr_maxtPairVal = [0, bestHands[0][1][tripsIdx].getValue()];
             for (let i = 1; i < bestHands.length; i++) {
                 let idx = this.getTripsIndex(bestHands[i][1]);
-                if (bestHands[i][1][idx] > plr_maxtPairVal[1]) {
-                    plr_maxtPairVal = [i,bestHands[i][1][idx]];
+                if (bestHands[i][1][idx].getValue() > plr_maxtPairVal[1]) {
+                    plr_maxtPairVal = [i,bestHands[i][1][idx].getValue()];
                     largestHands = [];
                     largestHands.push(bestHands[i]);
                 }
-                else if (bestHands[i][1][idx] === plr_maxtPairVal[1]) {
+                else if (bestHands[i][1][idx].getValue() === plr_maxtPairVal[1]) {
                     //need to check 2 pair
                     let tPairIdx = (idx + 3) % 5;
-                    let challenging2pairVal = bestHands[i][1][tPairIdx];
+                    let challenging2pairVal = bestHands[i][1][tPairIdx].getValue();
                     tPairIdx = this.getTripsIndex(bestHands[plr_maxtPairVal[0]][1]);
                     tPairIdx = (tPairIdx + 3) % 5;
-                    let current2pairVal = bestHands[plr_maxtPairVal[0]][1][tPairIdx];
+                    let current2pairVal = bestHands[plr_maxtPairVal[0]][1][tPairIdx].getValue();
                     if (challenging2pairVal > current2pairVal) {
                         plr_maxtPairVal[0] = i;
                         largestHands = [];

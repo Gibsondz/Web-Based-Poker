@@ -7,6 +7,7 @@ import { Card } from '../Card';
 import { CardValue } from '../CardValue';
 import { Suit } from '../Suit';
 import { Categories } from '../Categories';
+import { HandStatus } from '../HandStatus';
 
 describe('Poker Game Scenerios', () => { //Test container for poker game scenarios
     it('Basic Sample Hand', () => {
@@ -467,4 +468,323 @@ describe('Test Declare Winner Functionality', () => {
         checkBestHand = new BestHand(pokerGame.getGameRender().getHandStatusMap(), board);
         expect(checkBestHand.getCategoryIndex(board.map(c => c.getValue()),board.map(c => c.getSuit()))).to.equal(BestHand.CategoryList.findIndex(e => e.categoryName === Categories.HC));
     });
+});
+
+describe('Test Declare Winner Functionality', () => {
+    it('Test findWinner function', () => {
+        let Bob = new Player("Bob");
+        let John = new Player("John");
+        let tempStatusMap = new Map<Player, HandStatus>();
+        let firstHandStatus = new HandStatus(100);
+        //check multiple flush
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Ace, Suit.Heart),
+            new Card(CardValue.Six, Suit.Heart));
+        tempStatusMap.set(Bob, firstHandStatus);
+        let secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.King, Suit.Heart),
+            new Card(CardValue.Jack, Suit.Heart));
+        tempStatusMap.set(John, secondHandStatus);
+        let board = [
+            new Card(CardValue.Eight,Suit.Heart),
+            new Card(CardValue.Five,Suit.Heart),
+            new Card(CardValue.Ten,Suit.Club),
+            new Card(CardValue.Queen,Suit.Heart),
+            new Card(CardValue.Two,Suit.Spade)
+        ];
+        let checkBestHand = new BestHand(tempStatusMap, board);
+        let resultArray = checkBestHand.findWinner();
+        //check one winner
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("Bob");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([new Card(CardValue.Ace, Suit.Heart),
+            new Card(CardValue.Queen, Suit.Heart),
+            new Card(CardValue.Eight, Suit.Heart),
+            new Card(CardValue.Six, Suit.Heart),
+            new Card(CardValue.Five, Suit.Heart)]);
+
+        //check multiple high cards
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Nine, Suit.Heart),
+            new Card(CardValue.Jack, Suit.Heart)
+        );
+        tempStatusMap.set(John, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Eight, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Spade)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Jack,Suit.Club),
+            new Card(CardValue.Two,Suit.Club),
+            new Card(CardValue.Three,Suit.Heart),
+            new Card(CardValue.Five,Suit.Spade),
+            new Card(CardValue.Ace,Suit.Spade)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winner
+        expect(resultArray.length).to.equal(1);
+        //check winner is john
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Ace, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Nine, Suit.Heart),
+            new Card(CardValue.Five, Suit.Spade)]);
+        //check another high card edge case
+        checkBestHand.setBoard([
+            new Card(CardValue.Jack,Suit.Club),
+            new Card(CardValue.Two,Suit.Club),
+            new Card(CardValue.Three,Suit.Heart),
+            new Card(CardValue.Five,Suit.Spade),
+            new Card(CardValue.Four,Suit.Spade)
+        ]);
+        resultArray = checkBestHand.findWinner();
+        //check one winner
+        expect(resultArray.length).to.equal(1);
+        //check winner is john
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Four, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Nine, Suit.Heart),
+            new Card(CardValue.Five, Suit.Spade)]);
+
+        //check final high card edge case
+        checkBestHand.setBoard([
+            new Card(CardValue.Jack,Suit.Club),
+            new Card(CardValue.Two,Suit.Club),
+            new Card(CardValue.Three,Suit.Heart),
+            new Card(CardValue.Ten,Suit.Spade),
+            new Card(CardValue.Ace,Suit.Spade)
+        ]);
+        resultArray = checkBestHand.findWinner();
+        //check one winner
+        expect(resultArray.length).to.equal(1);
+        //check winner is john
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Ten, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Nine, Suit.Heart),
+            new Card(CardValue.Ace, Suit.Spade)]);
+        //check one pair split pot
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Nine, Suit.Diamond),
+            new Card(CardValue.Jack, Suit.Spade)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check split
+        expect(resultArray.length).to.equal(2);
+
+        //check two pair
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Two, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Heart)
+        );
+        tempStatusMap.set(John, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Three, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Spade)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Nine,Suit.Club),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Three,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Ace,Suit.Spade)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check split
+        expect(resultArray.length).to.equal(2);
+        
+        //check contested two pair final kicker
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.King, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Spade)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Nine,Suit.Club),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Three,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Five,Suit.Spade)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winer
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("Bob");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Nine, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Diamond),
+            new Card(CardValue.Jack, Suit.Spade),
+            new Card(CardValue.Nine, Suit.Club),
+            new Card(CardValue.King, Suit.Spade)]);
+
+        //test a cursed 4k win
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Ace, Suit.Diamond),
+            new Card(CardValue.Two, Suit.Club)
+        );
+        tempStatusMap.set(John, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.King, Suit.Spade),
+            new Card(CardValue.King, Suit.Club)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.King,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Club),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Heart)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winer
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Ace,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Club),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Heart)
+        ]);
+
+        //test contested 3k
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Two, Suit.Diamond)
+        );
+        tempStatusMap.set(Bob, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Nine, Suit.Heart)
+        );
+        tempStatusMap.set(John, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Three,Suit.Spade),
+            new Card(CardValue.Five,Suit.Diamond),
+            new Card(CardValue.Seven,Suit.Heart)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winer
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Nine,Suit.Heart),
+            new Card(CardValue.Seven,Suit.Heart)
+        ]);
+
+        //test contested 3k final card
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Two, Suit.Diamond)
+        );
+        tempStatusMap.set(Bob, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Nine, Suit.Heart)
+        );
+        tempStatusMap.set(John, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Three,Suit.Spade),
+            new Card(CardValue.Five,Suit.Diamond),
+            new Card(CardValue.King,Suit.Heart)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winer
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Jack, Suit.Club),
+            new Card(CardValue.Nine,Suit.Heart),
+            new Card(CardValue.King,Suit.Heart)
+        ]);
+
+        //test multiple full house
+        firstHandStatus = new HandStatus(100);
+        firstHandStatus.setHoleCards(
+            new Card(CardValue.Jack, Suit.Spade),
+            new Card(CardValue.Jack, Suit.Diamond)
+        );
+        tempStatusMap.set(John, firstHandStatus);
+        secondHandStatus = new HandStatus(100);
+        secondHandStatus.setHoleCards(
+            new Card(CardValue.Queen, Suit.Club),
+            new Card(CardValue.Nine, Suit.Club)
+        );
+        tempStatusMap.set(Bob, secondHandStatus);
+        checkBestHand.setBoard([
+            new Card(CardValue.Queen,Suit.Heart),
+            new Card(CardValue.Nine,Suit.Spade),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Jack,Suit.Heart),
+            new Card(CardValue.Two,Suit.Diamond)
+        ]);
+        checkBestHand.setHandStatusMap(tempStatusMap);
+        resultArray = checkBestHand.findWinner();
+        //check one winer
+        expect(resultArray.length).to.equal(1);
+        //check winner is bob
+        expect(resultArray[0][0].getName()).to.equal("John");
+        //check best hand
+        expect(resultArray[0][1]).to.have.deep.members([
+            new Card(CardValue.Jack,Suit.Spade),
+            new Card(CardValue.Jack,Suit.Diamond),
+            new Card(CardValue.Jack, Suit.Heart),
+            new Card(CardValue.Nine,Suit.Diamond),
+            new Card(CardValue.Nine,Suit.Spade)
+        ]);
+
+    });
+
 });
