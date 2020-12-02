@@ -78,16 +78,16 @@ export default {
     },
     async created() {
       try{
-      let allCookies = document.cookie
-      let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
-      let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
-      this.id = id
-      console.log(id)
-      let res  = await this.$axios.post('/users/getUser', {
-        id: id,
-      })
-      this.username = res.data.user.username
-      this.email = res.data.user.email
+        let allCookies = document.cookie
+        let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
+        let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
+        this.id = id
+        console.log(id)
+        let res  = await this.$axios.post('/users/getUser', {
+          id: id,
+        })
+        this.username = res.data.user.username
+        this.email = res.data.user.email
 
       
 

@@ -15,13 +15,17 @@ export class User extends EntityBase {
 
     @Column()
     password: string
+
+    @Column({ nullable: true })
+    isAdmin: boolean
     
 
     toObject() {
         return {
             displayName: this.username,
             password: this.password,
-            email: this.email
+            email: this.email,
+            isAdmin: this.isAdmin
         }
     }
 }
