@@ -23,13 +23,18 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 export async function signUp(req: Request, res: Response, next: NextFunction) {
     try{
         let ID = '_' + Math.random().toString(36).substr(2, 9);
-    
+        let users = await User.find()
         console.log(ID)
         let user = new User()
         user.id = ID
         user.username = req.body.username
         user.email = req.body.email
         user.password = req.body.password
+        if(users.length === 0){
+            user.isAdmin = true
+        }else{
+            user.isAdmin = false
+        }
         await user.save()
         res.json(user)
     }
