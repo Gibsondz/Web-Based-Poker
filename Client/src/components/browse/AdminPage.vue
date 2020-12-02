@@ -19,19 +19,27 @@
                         <div></div>
                         <span class="passwordLabel">Confirm Password: </span>
                         <v-text-field class="passwordField" v-model="confirmPwChanges[i]" label="Password" type="password"></v-text-field>
-                        <v-btn class="changePasswordButton" primary medium inline @click="changePassword(user.username, i)">Change Password</v-btn>
+                        <v-btn class="changePasswordButton" primary medium inline @click="changePassword(user.username, user.userId, i)">Change Password</v-btn>
                         <div class="userTypeInputs">
                             <span class="changeUserTypeLabel">Change User Type: </span>
-                            <v-btn class="userTypeButton" primary medium inline @click="makeAdmin(user.username)">Make Admin</v-btn>
-                            <v-btn class="userTypeButton" primary medium inline @click="makeStandard(user.username)">Make Standard</v-btn>
+                            <v-btn class="userTypeButton" primary medium inline @click="makeAdmin(user.username, i)">Make Admin</v-btn>
+                            <v-btn class="userTypeButton" primary medium inline @click="makeStandard(user.username, i)">Make Standard</v-btn>
                         </div>
                         <div class="deactivateUser">
-                            <v-btn class="deactivateUserButton" large inline @click="deactivateUser(user.username)">Deactivate User</v-btn>
+                            <v-btn class="deactivateUserButton" large inline @click="deactivateUser(user.username, i)">Deactivate User</v-btn>
                         </div>
                     </div>
                 </b-card>
             </b-collapse>
-        </div>        
+        </div>
+        <v-snackbar v-model="snackbar" :timeout="3000" :top="true">
+            {{snackbarMessage}}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>        
     </v-container>
 </template>
 <script>
@@ -45,37 +53,81 @@ export default {
             username: 'me',
             password: '',
             email: '',
-
-            users: [
-                {username: "bobby", isAdmin:true},
-                {username: "robby", isAdmin:false},
-                {username: "bob", isAdmin:true},
-                {username: "coolguy", isAdmin:false},
-                {username: "eaeeee", isAdmin:false}
-            ],
+            snackbar: false,
+            snackbarMessage: '',
+            users: [],
 
             pwChanges: {},
             confirmPwChanges: {},
         }
     },
     async created() {
+        let allCookies = document.cookie
+        let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
+        let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
+        this.id = id
+        let res  = await this.$axios.post('/users/getUser', {
+          id: id,
+        })
+        this.user = res.data.user
+        if(!this.user.isAdmin){
+            window.location.href = "/lobby"
+
+        }
+        res  = await this.$axios.post('/users/getAllUser')
+        let currentUsers = res.data.users
+        for(let i = 0; i < currentUsers.length; i++){
+            this.users.push({username:currentUsers[i].username, isAdmin: currentUsers[i].isAdmin, userId: currentUsers[i].id})
+        }
+
     },    
     methods:{
-        async changePassword(username, i) {
-            console.log(username);
-            console.log(this.pwChanges[i]);
-            console.log(this.confirmPwChanges[i]);
+        async changePassword(username, userId, i) {
+            let res  = await this.$axios.post('/users/updateUser', {
+                id: userId,
+                username: username,
+                newPassword: this.pwChanges[i],
+                confirmNewPassword: this.confirmPwChanges[i]
+            })
+            if(res.data.message){
+                this.snackbarMessage = 'Update Successful'
+                this.snackbar=true
+                this.pwChanges[i] = ''
+                this.confirmPwChanges[i] = ''
+            }else if(res.data === 'passwords do not match'){
+                this.snackbarMessage = 'Password do not match'
+                this.snackbar=true
+                this.pwChanges[i] = ''
+                this.confirmPwChanges[i] = ''
+            }
         },
-        async makeAdmin(username) {
-            console.log(username);
+        async makeAdmin(username, i) {
+             let res  = await this.$axios.post('/users/makeAdmin', {
+                 username: username 
+            })
+            if(res.data.success){
+                this.users[i].isAdmin = true
+            }
+            
         },
-        async makeStandard(username) {
-            console.log(username);
+        async makeStandard(username, i) {
+            let res  = await this.$axios.post('/users/makeStandard', {
+                 username: username 
+            })
+            if(res.data.success){
+                this.users[i].isAdmin = false
+            }
         },
-        async deactivateUser(username) {
+        async deactivateUser(username, i) {
             console.log(username);
             if(confirm("Are you sure?")){
+                let res  = await this.$axios.post('/users/deleteUser', {
+                 username: username 
+                })
 
+            if(res.data.success){
+                this.users.splice(i, 1)
+            }
             }
         },
     }
