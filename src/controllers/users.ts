@@ -48,13 +48,16 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
 
 }
 export async function getUser(req: Request, res: Response, next: NextFunction) {
-    let user = await User.findOneOrFail(req.body.id)
-    console.log(user)
-    res.json({
-        user: user
-    })
-
-
+    try{
+        let user = await User.findOneOrFail(req.body.id)
+        console.log(user)
+        res.json({
+            user: user
+        })
+    }
+    catch(err){
+        res.json('fail')
+    }
 }
 export async function getAllUsers(req: Request, res: Response, next: NextFunction) {
     let users = await User.find()

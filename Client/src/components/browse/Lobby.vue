@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container v-if="user">
         <div class="contentLayout">
             <ul class="lobbyList"> 
                 <li  v-for="lobby in lobbies" :key="lobby.id">
@@ -64,14 +64,22 @@ export default {
             isAdmin: false
         }
     },
+
     async created() {
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on('newGame', this.addGame)
         this.$ws.on('endGame', this.endGame)
-        let allCookies = document.cookie
-        let place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
-        let id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
-        this.id = id
+        let id = ''
+        let place = ''
+        try{
+            let allCookies = document.cookie
+            place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
+            id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
+            this.id = id
+        }
+        catch(err){
+            window.location.href = "/"
+        }
         let res  = await this.$axios.post('/users/getUser', {
           id: id,
         })
