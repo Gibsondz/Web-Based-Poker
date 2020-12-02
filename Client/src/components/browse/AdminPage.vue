@@ -39,7 +39,8 @@
                     Close
                 </v-btn>
             </template>
-        </v-snackbar>        
+        </v-snackbar>
+        <v-btn class="adminButton" @click="lobbyPage">Back</v-btn>
     </v-container>
 </template>
 <script>
@@ -47,7 +48,6 @@ export default {
     components: {
     },
     data() {
-        // TODO remove sample data
         return {
             user: null,
             username: 'me',
@@ -125,10 +125,13 @@ export default {
                  username: username 
                 })
 
-            if(res.data.success){
-                this.users.splice(i, 1)
+                if(res.data.success){
+                    this.users.splice(i, 1)
+                }
             }
-            }
+        },
+        async lobbyPage(){
+            window.location.href = "/lobby"
         },
     }
 }
@@ -202,5 +205,12 @@ export default {
 .collapsed > .openIcon,
 :not(.collapsed) > .closedIcon {
   display: none;
+}
+
+.adminButton{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 30px;
 }
 </style>
