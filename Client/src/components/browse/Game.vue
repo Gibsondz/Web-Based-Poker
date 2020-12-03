@@ -361,7 +361,7 @@ export default {
             console.log("gamerendering: ");
             console.log( this.gameRendering); 
             
-            this.isActivePlayer = res.data.activePlayer.name === this.user.username ;
+            this.isActivePlayer = res.data.activePlayer.name === this.user.username;
             this.isBetOut = res.data.isBetOut;
             this.isBigBlindCase = this.getBigBlindCase();
             
