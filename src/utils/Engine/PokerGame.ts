@@ -102,7 +102,7 @@ export class PokerGame
             }
         }
         this.started = true;
-        this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);\
+        this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
         
         let blindInterval = setInterval(() => {
             this.currentBlindTimer--;
