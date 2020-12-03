@@ -309,7 +309,7 @@ export async function fetchGames(req: Request, res: Response, next: NextFunction
 }
  async function checkWin(gameId) {
     let game = games.find(game => game.id == gameId)
-    let counter = 1
+    let counter = 0
     let potentalWinner = null
     let keys :Player[] = Array.from( game.stackMap.keys() );
             for(let i = 0; i < keys.length; i++){
