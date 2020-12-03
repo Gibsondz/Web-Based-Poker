@@ -518,4 +518,9 @@ export class Hand{
             }
         }
     }
+
+    public getHandBigBlindSize() : number 
+    {
+        return this.bigBlindSize;
+    }
 }

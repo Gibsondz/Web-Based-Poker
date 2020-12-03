@@ -77,7 +77,8 @@ export async function getRendering(req: Request, res: Response, next: NextFuncti
             blinds: {
                 smallBlind: gameRender.getBlinds().getSmallBlind(),
                 bigBlind: gameRender.getBlinds().getBigBlind(),
-                blindTimer: gameRender.getBlindTimer()
+                blindTimer: gameRender.getBlindTimer(),
+                currentHandBigBlind: gameRender.getCurrentHandBigBlind()
             },
             players: players,
             board: gameRender.getBoard(),

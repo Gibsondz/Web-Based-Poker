@@ -230,7 +230,8 @@ export class PokerGame
 
     public getGameRender() : GameRender
     {
-        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), this.blindLevels.get(this.currentBlindLevel), this.currentBlindTimer, this.currentHand.getBoard());
+        return new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), 
+            this.blindLevels.get(this.currentBlindLevel), this.currentBlindTimer, this.currentHand.getBoard(), this.currentHand.getHandBigBlindSize());
     }
 
     public isFinished() : boolean

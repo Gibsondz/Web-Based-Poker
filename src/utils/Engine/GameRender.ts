@@ -12,8 +12,9 @@ export class GameRender
     private blinds: Blind
     private blindTimer: number;
     private board: Array<Card>;
+    private currentHandBigBlind: number;
 
-    constructor( pot : number, map : CircularHandStatusMap, blinds: Blind, blindTimer: number, board : Array<Card>)
+    constructor( pot : number, map : CircularHandStatusMap, blinds: Blind, blindTimer: number, board : Array<Card>, currentHandBigBlind : number)
     {
         this.potsize = pot;
         this.circularHandStatusMap = map;
@@ -21,6 +22,7 @@ export class GameRender
         this.blinds = blinds;
         this.blindTimer = blindTimer;
         this.board = board;
+        this.currentHandBigBlind = currentHandBigBlind;
     }
 
     public getPotsize()
@@ -56,5 +58,10 @@ export class GameRender
     public isBetOut(): boolean
     {
         return this.circularHandStatusMap.getHighestBet() != 0;
+    }
+
+    public getCurrentHandBigBlind(): number 
+    {
+        return this.currentHandBigBlind;
     }
 }

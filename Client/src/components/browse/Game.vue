@@ -272,8 +272,16 @@ export default {
       
     methods:{
         updateUi() {
+            this.clearInactive();
             this.updateBoard();
             this.updatePlayerValues();
+        },
+        clearInactive() {
+            for (let i = 1 ; i < 10 ; i++ ) {
+                let playerIdentifier = "player" + i;
+                let player = document.getElementById( playerIdentifier );
+                player.style.display = "none";
+            }
         },
         updatePlayerValues() {
             let playerNumber = this.gameRendering.data.players.length;
@@ -297,7 +305,14 @@ export default {
                 player.style.display = "block";
                 
                 //player points and name
-                let playerData = this.gameRendering.data.players[(startIndex + i) % playerNumber];
+                // spaghetti DONT TOUCH, blame justin
+                let playerIndex = startIndex - i;
+                if ( playerIndex < 0 ) {
+                    playerIndex = playerNumber + playerIndex;
+                }
+                console.log(playerIndex);
+
+                let playerData = this.gameRendering.data.players[playerIndex];
                 
                 let playerNameText = document.getElementById( playerIdentifier + "-name" );
                 playerNameText.innerHTML = playerData.name;
@@ -312,7 +327,7 @@ export default {
         },
         updateBoard() {
             let playerNumber = this.gameRendering.data.players.length;
-            let activeIndex = 0;
+            let activeIndex = -1;
             for ( let j = 0 ; j < playerNumber ; j++ ) {
                 if ( this.user.username === this.gameRendering.data.players[j].name ) {
                     activeIndex = j;
@@ -320,13 +335,16 @@ export default {
             }
             
             //update player cards
-            let playerCardOneSuit = this.gameRendering.data.players[activeIndex].holeCards[0].suit;
-            let playerCardOneValue = this.gameRendering.data.players[activeIndex].holeCards[0].value;
-            this.playerCardOne = { suit: playerCardOneSuit, value: playerCardOneValue };
+            if ( activeIndex !== -1 )
+            {
+                let playerCardOneSuit = this.gameRendering.data.players[activeIndex].holeCards[0].suit;
+                let playerCardOneValue = this.gameRendering.data.players[activeIndex].holeCards[0].value;
+                this.playerCardOne = { suit: playerCardOneSuit, value: playerCardOneValue };
 
-            let playerCardTwoSuit = this.gameRendering.data.players[activeIndex].holeCards[1].suit;
-            let playerCardTwoValue = this.gameRendering.data.players[activeIndex].holeCards[1].value;
-            this.playerCardTwo = { suit: playerCardTwoSuit, value: playerCardTwoValue };
+                let playerCardTwoSuit = this.gameRendering.data.players[activeIndex].holeCards[1].suit;
+                let playerCardTwoValue = this.gameRendering.data.players[activeIndex].holeCards[1].value;
+                this.playerCardTwo = { suit: playerCardTwoSuit, value: playerCardTwoValue };
+            }
 
             //pot cards
             if ( this.gameRendering.data.board.length === 0 ) {
@@ -349,7 +367,7 @@ export default {
             }
 
             //pot size 
-            document.getElementById( "potPoints" ).innerHTML = this.gameRendering.data.potSize ;
+            document.getElementById( "potPoints" ).innerHTML = this.gameRendering.data.potSize;
         }, 
         async requestRendering(){
             let res = await this.$axios.post('/game/getRendering', {
@@ -370,7 +388,7 @@ export default {
         getBigBlindCase() {
             let bigBlindCounter = 0;
             for ( let i = 0 ; i < this.gameRendering.data.players.length ; i++ ) {
-                if ( this.gameRendering.data.players[i].betChips === this.gameRendering.data.blinds.bigBlind ) {
+                if ( this.gameRendering.data.players[i].betChips === this.gameRendering.data.blinds.currentHandBigBlind ) {
                     bigBlindCounter++;
                 }
             }
