@@ -3,22 +3,22 @@
         <div class="tablecontainer">
             <img id="tableimg" src="../../assets/Resources/pokerTable.jpg" alt="poker table">
             <div class="pointwrapper"> 
-                <p id="potpoints">1000</p>
+                <p id="potPoints">1000</p>
             </div>
             <div class="potcontainer">
-                <img id="potcard1" src="../../assets/Resources/cards/clubs/2.png" alt="card1">
-                <img id="potcard2" src="../../assets/Resources/cards/clubs/3.png" alt="card2">
-                <img id="potcard3" src="../../assets/Resources/cards/clubs/4.png" alt="card3">
-                <img id="potcard2" src="../../assets/Resources/cards/diamonds/K.png" alt="card2">
-                <img id="potcard3" src="../../assets/Resources/cards/diamonds/Q.png" alt="card3">
+                <img v-if="potCardOne" id="potcard1" :src="require(`../../assets/Resources/cards/${potCardOne.suit}/${potCardOne.value}.png`)" alt="card1">
+                <img v-if="potCardTwo" id="potcard2" :src="require(`../../assets/Resources/cards/${potCardTwo.suit}/${potCardTwo.value}.png`)" alt="card2">
+                <img v-if="potCardThree" id="potcard3" :src="require(`../../assets/Resources/cards/${potCardThree.suit}/${potCardThree.value}.png`)" alt="card3">
+                <img v-if="potCardFour" id="potcard2" :src="require(`../../assets/Resources/cards/${potCardFour.suit}/${potCardFour.value}.png`)" alt="card2">
+                <img v-if="potCardFive" id="potcard3" :src="require(`../../assets/Resources/cards/${potCardFive.suit}/${potCardFive.value}.png`)" alt="card3">
             </div>
 
             <div class="playercontainer">
                 <div id="player1">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player1card1" src="../../assets/Resources/cards/hearts/4.png" alt="card3">
-                    <img id="player1card2" src="../../assets/Resources/cards/hearts/5.png" alt="card4">
+                    <img id="player1card1" :src="require(`../../assets/Resources/cards/${playerCardOne.suit}/${playerCardOne.value}.png`)" alt="card3">
+                    <img id="player1card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.suit}/${playerCardTwo.value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -30,7 +30,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="yourplayer-pot">
-                    200
+                        200
                     </p>
                 </div>
                 </div>
@@ -205,13 +205,13 @@
             </div>
             <div class="buttonscontainer">
                 <div v-if="isActivePlayer && isBetOut ">
-                    <v-text-field class="amount" v-model="numberData" label="Enter Amount"></v-text-field>
+                    <v-text-field class="amount" height="1vw" color="white" dark v-model="numberData" label="Enter Amount" outlined></v-text-field>
                     <button class="gameButton" @click="bet">Raise</button>
                     <button class="gameButton" @click="call">Call</button>
                     <button class="gameButton" @click="fold">Fold</button>
                 </div>
                 <div v-if="isActivePlayer && !isBetOut">
-                    <v-text-field class="amount" v-model="numberData" label="Enter Amount"></v-text-field>
+                    <v-text-field class="amount" height="1vw" color="white" dark v-model="numberData" label="Enter Amount" outlined></v-text-field>  
                     <button class="gameButton" @click="bet">Bet</button>
                     <button class="gameButton" @click="check">Check</button>
                     <button class="gameButton" @click="fold">Fold</button>
@@ -237,6 +237,13 @@ export default {
     },
     data() {
         return {
+            playerCardOne: { suit: 1, value: 2 },
+            playerCardTwo: { suit: 1, value: 2 },
+            potCardOne: null,
+            potCardTwo: null,
+            potCardThree: null,
+            potCardFour: null,
+            potCardFive: null,
             user: null, 
             gameId: '',
             gameRendering: null,
@@ -254,11 +261,9 @@ export default {
         id: id,
         })
         
-        this.user = res.data.user
+        this.user = res.data.user;
 
         await this.requestRendering();
-
-        this.gameSetup();
 
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on(`${this.gameId}/renderGame`, this.requestRendering)
@@ -268,24 +273,33 @@ export default {
     }, 
       
     methods:{
-        gameSetup() {
+        updateUi() {
+            this.updateBoard();
+            this.updatePlayerValues();
+        },
+
+        updatePlayerValues() {
             let playerNumber = this.gameRendering.data.players.length;
             let startIndex = 0;
+
+            for ( let j = 0 ; j < playerNumber ; j++ ) {
+                if ( this.user.username === this.gameRendering.data.players[j].name ) {
+                    startIndex = j;
+                }
+            }
+
             for ( let i = 0 ; i < playerNumber ; i++ ) {
                 let playerSpot = Math.ceil( (9 / playerNumber) * i );
                 if ( playerSpot === 0 ) {
-                    for ( let j = 0 ; j < playerNumber ; j++ ) {
-                        if ( this.user.username === this.gameRendering.data.players[j].name ) {
-                            startIndex = j;
-                        }
-                    }
                     playerSpot++;
                 }
 
+                //player position display
                 let playerIdentifier = "player" + playerSpot;
                 let player = document.getElementById( playerIdentifier );
                 player.style.display = "block";
                 
+                //player points and name
                 let playerData = this.gameRendering.data.players[(startIndex + i) % playerNumber];
                 
                 let playerNameText = document.getElementById( playerIdentifier + "-name" );
@@ -294,29 +308,51 @@ export default {
                 let playerPointsText = document.getElementById( playerIdentifier + "-points" );
                 playerPointsText.innerHTML = playerData.stackSize;
             }
+
         },
-        updateUi() {
+
+        updateBoard() {
             let playerNumber = this.gameRendering.data.players.length;
-            let startIndex = 0;
-            for ( let i = 0 ; i < playerNumber ; i++ ) {
-                let playerSpot = Math.ceil( (9 / playerNumber) * i );
-                if ( playerSpot === 0 ) {
-                    for ( let j = 0 ; j < playerNumber ; j++ ) {
-                        if ( this.user.username === this.gameRendering.data.players[j].name ) {
-                            startIndex = j;
-                        }
-                    }
-                    playerSpot++;
+            let activeIndex = 0;
+            for ( let j = 0 ; j < playerNumber ; j++ ) {
+                if ( this.user.username === this.gameRendering.data.players[j].name ) {
+                    activeIndex = j;
                 }
-
-                let playerIdentifier = "player" + playerSpot;
-                let playerData = this.gameRendering.data.players[(startIndex + i) % playerNumber];
-
-                let playerPointsText = document.getElementById( playerIdentifier + "-points" );
-                playerPointsText.innerHTML = playerData.stackSize;
-
             }
-        },
+            
+            //update player cards
+            let playerCardOneSuit = this.gameRendering.data.players[activeIndex].holeCards[0].suit;
+            let playerCardOneValue = this.gameRendering.data.players[activeIndex].holeCards[0].value;
+            this.playerCardOne = { suit: playerCardOneSuit, value: playerCardOneValue };
+
+            let playerCardTwoSuit = this.gameRendering.data.players[activeIndex].holeCards[1].suit;
+            let playerCardTwoValue = this.gameRendering.data.players[activeIndex].holeCards[1].value;
+            this.playerCardTwo = { suit: playerCardTwoSuit, value: playerCardTwoValue };
+
+            //pot cards
+            if ( this.gameRendering.data.board.length === 0 ) {
+                this.potCardOne = null;
+                this.potCardTwo = null; 
+                this.potCardThree = null;
+                this.potCardFour = null;
+                this.potCardFive = null;
+            }
+            if ( this.gameRendering.data.board.length > 0 && this.gameRendering.data.board.length < 4) {
+                this.potCardOne = { suit: this.gameRendering.data.board[0].suit , value: this.gameRendering.data.board[0].value };
+                this.potCardTwo = { suit: this.gameRendering.data.board[1].suit , value: this.gameRendering.data.board[1].value };
+                this.potCardThree = { suit: this.gameRendering.data.board[2].suit , value: this.gameRendering.data.board[2].value };
+            }
+            if ( this.gameRendering.data.board.length === 4 ) {
+                this.potCardFour = { suit: this.gameRendering.data.board[3].suit , value: this.gameRendering.data.board[3].value };
+            }
+            if ( this.gameRendering.data.board.length === 5 ) {
+                this.potCardFive = { suit: this.gameRendering.data.board[4].suit , value: this.gameRendering.data.board[4].value  };
+            }
+
+            //pot size 
+            document.getElementById( "potPoints" ).innerHTML = this.gameRendering.data.potSize ;
+        }, 
+
         async requestRendering(){
             let res = await this.$axios.post('/game/getRendering', {
                 gameId: this.gameId,
@@ -520,29 +556,28 @@ export default {
 
 .buttonscontainer{
   position: absolute;
-  left: 73%;
-  top: 88%;
+  left: 65%;
+  top: 87%;
   transform: translate(-37%, 0%);
-  width: 25vw;
 }
 
 .amount {
-    width: 10vw; 
-    height: auto;
+    margin-right: 0.25vw;
+    width: 10vw;
     float: left;
-    background-color: white;
 }
 
 .gameButton {
-    width: 4vw;
+    width: 6vw;
     font-size: 1vw;
     background-color: white;
-    height: 3vw;
+    height: 3.7vw;
     margin: 0.1vw;
     border-style: solid;
     border-radius: 1.2vw;
     border-width: 0.2vw;
     color: black;
     float: left;
+    transform: translate(0%, -13%);
 }
 </style>
