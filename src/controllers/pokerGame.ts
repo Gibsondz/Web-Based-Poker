@@ -107,6 +107,7 @@ export async function call(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.call(player);
+        checkWin(gameid)
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -135,6 +136,7 @@ export async function bet(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.bet(player, amount);
+        checkWin(gameid)
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -241,6 +243,7 @@ export async function fold(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.fold(player);
+        checkWin(gameid)
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -268,6 +271,7 @@ export async function check(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.check(player);
+        checkWin(gameid)
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -302,4 +306,20 @@ export async function fetchGames(req: Request, res: Response, next: NextFunction
     catch(err){
         res.json('fail')
     }
+}
+ async function checkWin(gameId) {
+    let game = games.find(game => game.id == gameId)
+    let counter = 0
+    let potentalWinner = null
+    let keys :Player[] = Array.from( game.stackMap.keys() );
+            for(let i = 0; i < keys.length; i++){
+                if(game.stackMap.get(keys[i]) > 0){
+                    counter++
+                    potentalWinner = keys[i]
+                }
+            }
+            if(counter === 1){
+                console.log("the game is won ")
+                console.log("the winner is: ", potentalWinner.name)
+            }
 }
