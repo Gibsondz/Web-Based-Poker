@@ -112,6 +112,7 @@ export class PokerGame
                 this.currentBlindTimer = this.blindTimer;
                 if(this.currentBlindLevel >= 10)
                 {
+                    this.currentBlindLevel = 10;
                     clearInterval(blindInterval);
                 }
             }
