@@ -101,6 +101,7 @@ export default {
                 }
 
         }else{
+            window.addEventListener('beforeunload', this.closedWindow)
                 this.gameId = this.pokerGameId
                 this.host = this.pokerGameHost
                  let res  = await this.$axios.post('/game/fetchPlayers', {
@@ -157,6 +158,19 @@ export default {
             console.log(value)
             this.players.push(value)
         },
+        async closedWindow(){
+            if(this.isHost){
+                await this.$axios.post('/game/closeLobby', {
+                    gameId: this.gameId
+                })
+            }else{
+                document.cookie = 'tab=lobby'
+                await this.$axios.post('/game/kickPlayer', {
+                    gameId: this.gameId,
+                    username: this.user.username
+                })
+            }
+        },
         async leave({method, value}){
             for(let i = 0; i < this.players.length; i++){
                 if(this.players[i].username === value.username){
@@ -177,6 +191,7 @@ export default {
             }
             if(this.players.length+1 >= 2 && this.players.length+1 <= 9)
             {
+                
                document.cookie = 'tab=lobby'
                window.location.href = "/game"; 
             }

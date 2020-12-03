@@ -7,34 +7,43 @@ import { GameRender } from '../utils/Engine/GameRender'
 let games : PokerGame[] = [];
 
 export async function openLobby(req: Request, res: Response, next: NextFunction) {
-    let game = games.find(me => me.host === req.body.username)
-    if(game){
-        res.json({
-        message: 'exsists', 
-        gameId: game.id,
-        isStarted: game.started
-     })
-    }else{
-            let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer, req.body.name, req.body.password)
-            pokerGame.addPlayer(new Player(req.body.username))
-            games.push(pokerGame)
-            const pubsub = Pubsub.getInstance()
-            await pubsub.post('newGame', {game: pokerGame})
-            res.json({gameId: pokerGame.id})
+    try{
+        let game = games.find(me => me.host === req.body.username)
+        if(game){
+            res.json({
+            message: 'exsists', 
+            gameId: game.id,
+            isStarted: game.started
+        })
+        }else{
+                let pokerGame = new PokerGame(req.body.username, req.body.stackSize, req.body.blindTimer, req.body.name, req.body.password)
+                pokerGame.addPlayer(new Player(req.body.username))
+                games.push(pokerGame)
+                const pubsub = Pubsub.getInstance()
+                await pubsub.post('newGame', {game: pokerGame})
+                res.json({gameId: pokerGame.id})
 
+        }
+    }
+    catch(err){
+        console.log(err)
+        res.json('fail')
     }
 }
 
 export async function start(req: Request, res: Response, next: NextFunction)
 {
-    let gameid = req.body.gameId;
-    let game = games.find(game => game.id == gameid);
-
-    game.start();
-
-    const pubsub = Pubsub.getInstance()
-    await pubsub.post(`${gameid}/pokerLobbyStart`, {game: game})
-    res.json('success');
+    try{
+        let gameid = req.body.gameId;
+        let game = games.find(game => game.id == gameid);
+        game.start();
+        const pubsub = Pubsub.getInstance()
+        await pubsub.post(`${gameid}/pokerLobbyStart`, {game: game})
+        res.json('success');
+    }
+    catch(err){
+        res.json('fail');
+    }
 }
 
 export async function getRendering(req: Request, res: Response, next: NextFunction)
@@ -138,20 +147,24 @@ export async function bet(req: Request, res: Response, next: NextFunction) {
 
 
 export async function newPlayer(req: Request, res: Response, next: NextFunction) {
-    let game = null
-    for(let i = 0; i < games.length; i++){
-        if(games[i].id === req.body.gameId){
-            game = games[i]
-            games[i].addPlayer(new Player(req.body.username))
+    try{
+        let game = null
+        for(let i = 0; i < games.length; i++){
+            if(games[i].id === req.body.gameId){
+                game = games[i]
+                games[i].addPlayer(new Player(req.body.username))
+            }
         }
+        const pubsub = Pubsub.getInstance()
+        await pubsub.post(`${req.body.gameId}/pokerLobby`, {
+            username: req.body.username,
+            id: req.body.gameId
+        })
+        res.json('success')
     }
-    const pubsub = Pubsub.getInstance()
-    await pubsub.post(`${req.body.gameId}/pokerLobby`, {
-        username: req.body.username,
-        id: req.body.gameId
-    })
-    res.json('success')
-
+    catch(err){
+        res.json('fail')
+    }
 }
 export async function kickPlayer(req: Request, res: Response, next: NextFunction) {
     try{
@@ -267,16 +280,26 @@ export async function check(req: Request, res: Response, next: NextFunction) {
 
 
 export async function closeLobby(req: Request, res: Response, next: NextFunction) {
-    let cancelledGame = games.filter(game => game.id !== req.body.gameId)
-    games = cancelledGame
-    const pubsub = Pubsub.getInstance()
-    await pubsub.post('endGame', {id: req.body.gameId})
-    await pubsub.post(`${req.body.gameId}/pokerLobbyEnd`, {id: req.body.gameId})
-    res.json('success')
+    try{
+        let cancelledGame = games.filter(game => game.id !== req.body.gameId)
+        games = cancelledGame
+        const pubsub = Pubsub.getInstance()
+        await pubsub.post('endGame', {id: req.body.gameId})
+        await pubsub.post(`${req.body.gameId}/pokerLobbyEnd`, {id: req.body.gameId})
+        res.json('success')
+    }
+    catch(err){
+        res.json('fail') 
+    }
 
     
 }
 export async function fetchGames(req: Request, res: Response, next: NextFunction) {
-    let notStartedGames = games.filter(game=> game.started === false)
-    res.json(notStartedGames)
+    try{
+        let notStartedGames = games.filter(game=> game.started === false)
+        res.json(notStartedGames)
+    }
+    catch(err){
+        res.json('fail')
+    }
 }

@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container v-if="user">
         <div class="contentLayout">
             <ul class="lobbyList"> 
                 <li  v-for="lobby in lobbies" :key="lobby.id">
@@ -40,6 +40,7 @@
             </v-card-actions>
       </v-card>
          </v-dialog>
+         <v-btn v-if="isAdmin" class="adminButton" @click="adminPage">Admin page</v-btn>
     </v-container>
 </template>
 <script>
@@ -59,14 +60,33 @@ export default {
             lobbies:[],
             dialog: false,
             passwordToJoin: '',
-            tryingToJoinId: ''
+            tryingToJoinId: '',
+            isAdmin: false
         }
     },
+
     async created() {
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on('newGame', this.addGame)
         this.$ws.on('endGame', this.endGame)
-        let res  = await this.$axios.post('/game/fetchGames')
+        let id = ''
+        let place = ''
+        try{
+            let allCookies = document.cookie
+            place = allCookies.split('; ').find(row => row.startsWith('place')).split('=')[1]
+            id = allCookies.split('; ').find(row => row.startsWith('name')).split('=')[1]
+            this.id = id
+        }
+        catch(err){
+            window.location.href = "/"
+        }
+        let res  = await this.$axios.post('/users/getUser', {
+          id: id,
+        })
+        this.user = res.data.user
+        this.isAdmin = this.user.isAdmin
+
+        res  = await this.$axios.post('/game/fetchGames')
         this.games = res.data
         let lock = Boolean
         for(let i = 0; i < this.games.length; i++){
@@ -108,6 +128,10 @@ export default {
                 }else{
 
                 }
+            },
+            adminPage(){
+                window.location.href = "/adminPage"
+
             },
             async addGame({method, value}){
                 let lock = Boolean
@@ -215,7 +239,11 @@ export default {
     grid-template-columns: 40% 20% 20% 20%;
     
 }
-
+.adminButton{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
 button {
     border: black;
     background-color: rgb(147, 148, 147);
@@ -242,4 +270,5 @@ img{
 title {
     margin-top: 100px;
 }
+
 </style>

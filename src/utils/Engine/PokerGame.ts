@@ -102,13 +102,18 @@ export class PokerGame
             }
         }
         this.started = true;
-        this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
-        setInterval(() => {
+        this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);\
+        
+        let blindInterval = setInterval(() => {
             this.currentBlindTimer--;
             if(this.currentBlindTimer <= 0) //Time to increase the blinds
             {
                 this.currentBlindLevel++;
                 this.currentBlindTimer = this.blindTimer;
+                if(this.currentBlindLevel >= 10)
+                {
+                    clearInterval(blindInterval);
+                }
             }
         }, 60000);
     }
