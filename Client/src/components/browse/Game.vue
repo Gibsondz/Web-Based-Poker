@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="player-bottomrrow">
-                    <p id="yourplayer-pot">
+                    <p id="player1-pot">
                         200
                     </p>
                 </div>
@@ -204,7 +204,7 @@
                 </div>
             </div>
             <div class="buttonscontainer">
-                <div v-if="isActivePlayer && isBetOut ">
+                <div v-if="isActivePlayer && isBetOut && !isBigBlindCase">
                     <v-text-field class="amount" height="1vw" color="white" dark v-model="numberData" label="Enter Amount" outlined></v-text-field>
                     <button class="gameButton" @click="bet">Raise</button>
                     <button class="gameButton" @click="call">Call</button>
@@ -216,15 +216,12 @@
                     <button class="gameButton" @click="check">Check</button>
                     <button class="gameButton" @click="fold">Fold</button>
                 </div>
-                
-                <!--
                 <div v-if="isActivePlayer && isBetOut && isBigBlindCase"> 
-                    <v-text-field class="amount" v-model="numberData" label="Enter Amount"></v-text-field>
+                    <v-text-field class="amount" heigh="1vw" color="white" dark v-model="numberData" label="Enter Amount"></v-text-field>
                     <button class="gameButton" @click="bet">Raise</button>
-                    <button class="gameButton" @click="call">Check</button>
+                    <button class="gameButton" @click="check">Check</button>
                     <button class="gameButton" @click="fold">Fold</button>
                 </div>
-                -->
             </div>
         </div>
     </v-container>
@@ -249,6 +246,7 @@ export default {
             gameRendering: null,
             isActivePlayer: false,
             isBetOut: false,
+            isBigBlindCase: false,
             numberData: 0
         }
     },
@@ -277,7 +275,6 @@ export default {
             this.updateBoard();
             this.updatePlayerValues();
         },
-
         updatePlayerValues() {
             let playerNumber = this.gameRendering.data.players.length;
             let startIndex = 0;
@@ -307,10 +304,12 @@ export default {
 
                 let playerPointsText = document.getElementById( playerIdentifier + "-points" );
                 playerPointsText.innerHTML = playerData.stackSize;
+
+                //player bet chips
+                let playerBetChips = document.getElementById( playerIdentifier + "-pot" );
+                playerBetChips.innerHTML = playerData.betChips;
             }
-
         },
-
         updateBoard() {
             let playerNumber = this.gameRendering.data.players.length;
             let activeIndex = 0;
@@ -352,7 +351,6 @@ export default {
             //pot size 
             document.getElementById( "potPoints" ).innerHTML = this.gameRendering.data.potSize ;
         }, 
-
         async requestRendering(){
             let res = await this.$axios.post('/game/getRendering', {
                 gameId: this.gameId,
@@ -363,10 +361,24 @@ export default {
             console.log("gamerendering: ");
             console.log( this.gameRendering); 
             
-            this.isActivePlayer = res.data.activePlayer.name === this.user.username;
+            this.isActivePlayer = res.data.activePlayer.name === this.user.username ;
             this.isBetOut = res.data.isBetOut;
+            this.isBigBlindCase = this.getBigBlindCase();
             
             this.updateUi();
+        },
+        getBigBlindCase() {
+            let bigBlindCounter = 0;
+            for ( let i = 0 ; i < this.gameRendering.data.players.length ; i++ ) {
+                if ( this.gameRendering.data.players[i].betChips === this.gameRendering.data.blinds.bigBlind ) {
+                    bigBlindCounter++;
+                }
+            }
+            // might have to change this for active players when nearing 2 out of 3 players are left scenario
+            if ( bigBlindCounter === this.gameRendering.data.players.length && this.gameRendering.data.board.length === 0 ) {
+                return true;
+            }
+            return false;
         },
         async fold(){
             let res = await this.$axios.post('/game/fold', {
