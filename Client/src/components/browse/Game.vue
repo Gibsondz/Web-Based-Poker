@@ -310,7 +310,6 @@ export default {
                 if ( playerIndex < 0 ) {
                     playerIndex = playerNumber + playerIndex;
                 }
-                console.log(playerIndex);
 
                 let playerData = this.gameRendering.data.players[playerIndex];
                 
@@ -323,6 +322,14 @@ export default {
                 //player bet chips
                 let playerBetChips = document.getElementById( playerIdentifier + "-pot" );
                 playerBetChips.innerHTML = playerData.betChips;
+
+                if ( this.gameRendering.data.activePlayer.name === playerData.name ) {
+                    playerBetChips.style.backgroundColor = "green";
+                }
+                else {
+                    playerBetChips.style.backgroundColor = "blue";
+                }
+
             }
         },
         updateBoard() {
@@ -573,7 +580,6 @@ export default {
 
 .player-bottomrrow {
   color: white;
-  background-color: blue;
   text-align: center;
   border-style: solid;
   border-radius: 1.2vw;
