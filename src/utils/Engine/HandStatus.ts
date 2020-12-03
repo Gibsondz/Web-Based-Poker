@@ -21,7 +21,7 @@ export class HandStatus
 
     public bet(betSize: number)
     {
-        if(this.stackSize - betSize < 0 )
+        if(this.stackSize - betSize <= 0 )
         {
             this.betChips += this.stackSize;
             this.stackSize = 0;
