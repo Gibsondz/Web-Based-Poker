@@ -329,7 +329,7 @@ export default {
                 let playerBetChips = document.getElementById( playerIdentifier + "-pot" );
                 playerBetChips.innerHTML = playerData.betChips;
 
-                if ( this.gameRendering.data.activePlayer.name === playerData.name ) {
+                if ( this.gameRendering.data.activePlayer !== null && this.gameRendering.data.activePlayer.name === playerData.name ) {
                     playerBetChips.style.backgroundColor = "green";
                 }
                 else {
@@ -403,7 +403,14 @@ export default {
             console.log("gamerendering: ");
             console.log( this.gameRendering); 
             
-            this.isActivePlayer = res.data.activePlayer.name === this.user.username;
+            if(res.data.activePlayer !== null)
+            {
+               this.isActivePlayer = res.data.activePlayer.name === this.user.username; 
+            }
+            else
+            {
+                this.isActivePlayer = false;
+            }
             this.isBetOut = res.data.isBetOut;
             this.isBigBlindCase = this.getBigBlindCase();
             

@@ -20,6 +20,8 @@ export class PokerGame
     private currentBlindLevel: number;
     private bigBlindPointer: number;
     private finished: boolean;
+    private showdownRender : GameRender;
+    private showShowdown : boolean;
 
     constructor(Host: string, stackSize: number, blindTimer: number, name: string, password)
     {
@@ -37,6 +39,7 @@ export class PokerGame
         this.currentBlindLevel = 1;
         this.bigBlindPointer = 0;
         this.finished = false;
+        this.showShowdown = false;
     }
 
     public addPlayer(player: Player)
@@ -127,10 +130,7 @@ export class PokerGame
             return;
         }
         this.currentHand.call(player);
-        if(this.currentHand.isComplete())
-        {
-            this.createNewHand();
-        }
+        this.checkHandCompletion();
     }
 
     public check(player: Player)
@@ -141,10 +141,7 @@ export class PokerGame
             return;
         }
         this.currentHand.check(player);
-        if(this.currentHand.isComplete())
-        {
-            this.createNewHand();
-        }
+        this.checkHandCompletion();
     }
 
     public fold(player: Player) 
@@ -155,10 +152,7 @@ export class PokerGame
             return;
         }
         this.currentHand.fold(player);
-        if(this.currentHand.isComplete())
-        {
-            this.createNewHand();
-        }
+        this.checkHandCompletion();
     }
 
     public bet(player: Player, amount: number)
@@ -169,10 +163,7 @@ export class PokerGame
             return;
         }
         this.currentHand.bet(player, amount);
-        if(this.currentHand.isComplete())
-        {
-            this.createNewHand();
-        }
+        this.checkHandCompletion();
     }
 
     private createNewHand()
@@ -187,6 +178,23 @@ export class PokerGame
             this.moveBigBlind();
             this.currentHand = new Hand(this.stackMap, this.blindLevels.get(this.currentBlindLevel), this.bigBlindPointer);
         }
+    }
+
+    private checkHandCompletion()
+    {   
+        if(this.currentHand.isComplete())
+        {
+            this.createShowDownRender();
+            this.createNewHand();
+        }
+    }
+
+    private createShowDownRender()
+    {
+        this.showdownRender = new GameRender(this.currentHand.getPotSize(), this.currentHand.getCircularHandStatusMap(), 
+            this.blindLevels.get(this.currentBlindLevel), this.currentBlindTimer, this.currentHand.getBoard(), this.currentHand.getHandBigBlindSize());
+            
+        this.showShowdown = true; 
     }
 
     private moveBigBlind()
@@ -238,6 +246,21 @@ export class PokerGame
     public isFinished() : boolean
     {
         return this.finished;
+    }
+
+    public getShowdownRender() : GameRender
+    {
+        return this.showdownRender;
+    }
+
+    public useShowdownRender()
+    {
+        return this.showShowdown;
+    }
+
+    public setUseShowdownRender(shouldUse: boolean)
+    {
+        this.showShowdown = shouldUse;
     }
 
     private isGameFinished() : boolean
