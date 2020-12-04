@@ -322,5 +322,16 @@ export async function fetchGames(req: Request, res: Response, next: NextFunction
             if(counter === 1){
                 console.log("the game is won ")
                 console.log("the winner is: ", potentalWinner.name)
+                const pubsub = Pubsub.getInstance()
+                let user = await User.createQueryBuilder('user')
+                .where("user.username = :username",{
+                    username: potentalWinner.name,
+                })
+                .getOne()
+                user.wins++
+                user.save()
+                let cancelledGame = games.filter(game => game.id !== gameId)
+                games = cancelledGame
+                await pubsub.post(`${gameId}/gameOver`, {message: 'gameover'})
             }
 }

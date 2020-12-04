@@ -18,6 +18,9 @@ export class User extends EntityBase {
 
     @Column({ nullable: true })
     isAdmin: boolean
+
+    @Column({ nullable: true })
+    wins: 0
     
 
     toObject() {

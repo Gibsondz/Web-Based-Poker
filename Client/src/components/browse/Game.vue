@@ -265,6 +265,7 @@ export default {
 
         if(!this.$ws.connected) await this.$ws.connect()
         this.$ws.on(`${this.gameId}/renderGame`, this.requestRendering)
+        this.$ws.on(`${this.gameId}/gameOver`, this.gameOver)
     }, 
     async destroyed() {
 
@@ -275,6 +276,11 @@ export default {
             this.clearInactive();
             this.updateBoard();
             this.updatePlayerValues();
+        },
+        gameOver(){
+            document.cookie = 'gameId=""'
+            window.location.href='/lobby'
+
         },
         clearInactive() {
             for (let i = 1 ; i < 10 ; i++ ) {

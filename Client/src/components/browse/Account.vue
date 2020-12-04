@@ -1,10 +1,8 @@
 <template>
     <div class="navbar-offset">
-        <v-data-table
-            :headers="headers"
-            :items="games"
-            :items-per-page="5"
-        ></v-data-table>
+      <h1>You won {{wins}} games!</h1>
+      <br>
+      <br>
         <span>
             Display name
             <v-text-field v-model="username" class="txtFeilds" ></v-text-field>
@@ -63,17 +61,7 @@ export default {
             password: '',
             newPassword: '',
             confirmNewPassword: '',
-             headers: [
-          {
-            text: 'Game number',
-            align: 'start',
-            sortable: false,
-            value: 'name',
-          },
-          { text: 'Status', value: 'status' },
-        ],
-        games: [
-        ],
+            wins: 0
         }
     },
     async created() {
@@ -88,6 +76,7 @@ export default {
         })
         this.username = res.data.user.username
         this.email = res.data.user.email
+        this.wins = res.data.user.wins
 
       
 

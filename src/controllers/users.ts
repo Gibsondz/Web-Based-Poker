@@ -30,6 +30,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         user.username = req.body.username
         user.email = req.body.email
         user.password = req.body.password
+        user.wins = 0
         if(users.length === 0){
             user.isAdmin = true
         }else{
