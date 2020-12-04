@@ -54,6 +54,13 @@ export async function getRendering(req: Request, res: Response, next: NextFuncti
     if(game != null)
     {
         let gameRender = game.getGameRender();
+        let activePlayer = gameRender.getActivePlayer();
+        if(game.useShowdownRender())
+        {
+            gameRender = game.getShowdownRender();
+            activePlayer = null;
+        }
+
         let players = [];
         
         for( let [player, handStatus] of gameRender.getHandStatusMap() )
@@ -62,7 +69,7 @@ export async function getRendering(req: Request, res: Response, next: NextFuncti
             tempobj["name"] = player.getName();
             tempobj["stackSize"] = handStatus.getStackSize();
             tempobj["betChips"] = handStatus.getBetChips();
-            if(player.getName() === username)
+            if(player.getName() === username || (game.useShowdownRender()) && !handStatus.isFolded())
             {
                 tempobj["holeCards"] = handStatus.getHoleCards();
             }
@@ -73,7 +80,7 @@ export async function getRendering(req: Request, res: Response, next: NextFuncti
 
         res.json({
             potSize: gameRender.getPotsize(),
-            activePlayer: gameRender.getActivePlayer(),
+            activePlayer: activePlayer,
             blinds: {
                 smallBlind: gameRender.getBlinds().getSmallBlind(),
                 bigBlind: gameRender.getBlinds().getBigBlind(),
@@ -108,7 +115,16 @@ export async function call(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.call(player);
-        checkWin(gameid)
+        if(game.useShowdownRender())
+        {
+            let inter = setInterval(async () => {
+                game.setUseShowdownRender(false);
+                checkWin(gameid);
+                const pubsub = Pubsub.getInstance()
+                await pubsub.post(`${gameid}/renderGame`, {game: game})
+                clearInterval(inter);
+            }, 5000);
+        }
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -137,7 +153,16 @@ export async function bet(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.bet(player, amount);
-        checkWin(gameid)
+        if(game.useShowdownRender())
+        {
+            let inter = setInterval(async () => {
+                game.setUseShowdownRender(false);
+                checkWin(gameid);
+                const pubsub = Pubsub.getInstance()
+                await pubsub.post(`${gameid}/renderGame`, {game: game})
+                clearInterval(inter);
+            }, 5000);
+        }
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -244,7 +269,16 @@ export async function fold(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.fold(player);
-        checkWin(gameid)
+        if(game.useShowdownRender())
+        {
+            let inter = setInterval(async () => {
+                game.setUseShowdownRender(false);
+                checkWin(gameid);
+                const pubsub = Pubsub.getInstance()
+                await pubsub.post(`${gameid}/renderGame`, {game: game})
+                clearInterval(inter);
+            }, 5000);
+        }
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -272,7 +306,16 @@ export async function check(req: Request, res: Response, next: NextFunction) {
     if(player != null)
     {
         game.check(player);
-        checkWin(gameid)
+        if(game.useShowdownRender())
+        {
+            let inter = setInterval(async () => {
+                game.setUseShowdownRender(false);
+                checkWin(gameid);
+                const pubsub = Pubsub.getInstance()
+                await pubsub.post(`${gameid}/renderGame`, {game: game})
+                clearInterval(inter);
+            }, 5000);
+        }
         const pubsub = Pubsub.getInstance()
         await pubsub.post(`${gameid}/renderGame`, {game: game})
         res.json('success');
@@ -312,26 +355,26 @@ export async function fetchGames(req: Request, res: Response, next: NextFunction
     let game = games.find(game => game.id == gameId)
     let counter = 0
     let potentalWinner = null
-    let keys :Player[] = Array.from( game.stackMap.keys() );
-            for(let i = 0; i < keys.length; i++){
-                if(game.stackMap.get(keys[i]) > 0){
-                    counter++
-                    potentalWinner = keys[i]
-                }
-            }
-            if(counter === 1){
-                console.log("the game is won ")
-                console.log("the winner is: ", potentalWinner.name)
-                const pubsub = Pubsub.getInstance()
-                let user = await User.createQueryBuilder('user')
-                .where("user.username = :username",{
-                    username: potentalWinner.name,
-                })
-                .getOne()
-                user.wins++
-                user.save()
-                let cancelledGame = games.filter(game => game.id !== gameId)
-                games = cancelledGame
-                await pubsub.post(`${gameId}/gameOver`, {message: 'gameover'})
-            }
+    let keys : Player[] = Array.from( game.stackMap.keys() );
+    for(let i = 0; i < keys.length; i++){
+        if(game.stackMap.get(keys[i]) > 0){
+            counter++
+            potentalWinner = keys[i]
+        }
+     }
+    if(counter === 1){
+        console.log("the game is won ")
+        console.log("the winner is: ", potentalWinner.name)
+        const pubsub = Pubsub.getInstance()
+        let user = await User.createQueryBuilder('user')
+        .where("user.username = :username",{
+            username: potentalWinner.name,
+        })
+        .getOne()
+        user.wins++
+        user.save()
+        let cancelledGame = games.filter(game => game.id !== gameId)
+        games = cancelledGame
+        await pubsub.post(`${gameId}/gameOver`, {message: 'gameover'})
+    }
 }

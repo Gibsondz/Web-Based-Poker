@@ -77,6 +77,11 @@ export default {
         this.username = res.data.user.username
         this.email = res.data.user.email
         this.wins = res.data.user.wins
+        
+        if(this.wins === null)
+        {
+          this.wins = 0;
+        }
 
       
 
