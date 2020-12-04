@@ -316,7 +316,6 @@ export default {
                 if ( playerIndex < 0 ) {
                     playerIndex = playerNumber + playerIndex;
                 }
-                console.log(playerIndex);
 
                 let playerData = this.gameRendering.data.players[playerIndex];
                 
@@ -329,6 +328,25 @@ export default {
                 //player bet chips
                 let playerBetChips = document.getElementById( playerIdentifier + "-pot" );
                 playerBetChips.innerHTML = playerData.betChips;
+
+                if ( this.gameRendering.data.activePlayer.name === playerData.name ) {
+                    playerBetChips.style.backgroundColor = "green";
+                }
+                else {
+                    playerBetChips.style.backgroundColor = "blue";
+                }
+
+                //fold status
+                let cardOne = document.getElementById( playerIdentifier + "card1");
+                let cardTwo = document.getElementById( playerIdentifier + "card2");
+                if ( playerData.isFolded ) {
+                    cardOne.style.display = "none";
+                    cardTwo.style.display = "none";
+                }
+                else {
+                    cardOne.style.display = "inline-block";
+                    cardTwo.style.display = "inline-block";
+                }
             }
         },
         updateBoard() {
@@ -393,13 +411,17 @@ export default {
         },
         getBigBlindCase() {
             let bigBlindCounter = 0;
+            let activePlayerCounter = 0;
             for ( let i = 0 ; i < this.gameRendering.data.players.length ; i++ ) {
+                if ( !this.gameRendering.data.players[i].isFolded ) {
+                    activePlayerCounter++;
+                }
                 if ( this.gameRendering.data.players[i].betChips === this.gameRendering.data.blinds.currentHandBigBlind ) {
                     bigBlindCounter++;
                 }
             }
-            // might have to change this for active players when nearing 2 out of 3 players are left scenario
-            if ( bigBlindCounter === this.gameRendering.data.players.length && this.gameRendering.data.board.length === 0 ) {
+
+            if ( bigBlindCounter === activePlayerCounter && this.gameRendering.data.board.length === 0 ) {
                 return true;
             }
             return false;
@@ -579,7 +601,6 @@ export default {
 
 .player-bottomrrow {
   color: white;
-  background-color: blue;
   text-align: center;
   border-style: solid;
   border-radius: 1.2vw;
