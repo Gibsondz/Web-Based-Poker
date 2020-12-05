@@ -39,7 +39,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player2card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player2Suit}/${playerCardOne.player2Value}.png`)" alt="card3">
-                    <img id="player2card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player2Suit}/${playerCardOne.player2Value}.png`)" alt="card4">
+                    <img id="player2card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player2Suit}/${playerCardTwo.player2Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -60,7 +60,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player3card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player3Suit}/${playerCardOne.player3Value}.png`)" alt="card3">
-                    <img id="player3card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player3Suit}/${playerCardOne.player3Value}.png`)" alt="card4">
+                    <img id="player3card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player3Suit}/${playerCardTwo.player3Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -81,7 +81,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player4card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player4Suit}/${playerCardOne.player4Value}.png`)" alt="card3">
-                    <img id="player4card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player4Suit}/${playerCardOne.player4Value}.png`)" alt="card4">
+                    <img id="player4card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player4Suit}/${playerCardTwo.player4Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -102,7 +102,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player5card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player5Suit}/${playerCardOne.player5Value}.png`)" alt="card3">
-                    <img id="player5card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player5Suit}/${playerCardOne.player5Value}.png`)" alt="card4">
+                    <img id="player5card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player5Suit}/${playerCardTwo.player5Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -123,7 +123,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player6card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player6Suit}/${playerCardOne.player6Value}.png`)" alt="card3">
-                    <img id="player6card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player6Suit}/${playerCardOne.player6Value}.png`)" alt="card4">
+                    <img id="player6card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player6Suit}/${playerCardTwo.player6Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -144,7 +144,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player7card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player7Suit}/${playerCardOne.player7Value}.png`)" alt="card3">
-                    <img id="player7card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player7Suit}/${playerCardOne.player7Value}.png`)" alt="card4">
+                    <img id="player7card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player7Suit}/${playerCardTwo.player7Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -165,7 +165,7 @@
                 <div class="player-toprow">
                     <div class="cardcontainer">
                     <img id="player8card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player8Suit}/${playerCardOne.player8Value}.png`)" alt="card3">
-                    <img id="player8card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player8Suit}/${playerCardOne.player8Value}.png`)" alt="card4">
+                    <img id="player8card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player8Suit}/${playerCardTwo.player8Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -186,7 +186,7 @@
                     <div class="player-toprow">
                         <div class="cardcontainer">
                         <img id="player9card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player9Suit}/${playerCardOne.player9Value}.png`)" alt="card3">
-                        <img id="player9card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player9Suit}/${playerCardOne.player9Value}.png`)" alt="card4">
+                        <img id="player9card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player9Suit}/${playerCardTwo.player9Value}.png`)" alt="card4">
                         </div>
                         <div class="player-points">
                         <p>
