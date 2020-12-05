@@ -30,7 +30,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player1-pot">
-                        200
+                        9999
                     </p>
                 </div>
                 </div>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player2-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -72,7 +72,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player3-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player4-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -114,7 +114,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player5-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -135,7 +135,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player6-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -156,7 +156,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player7-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -177,7 +177,7 @@
                 </div>
                 <div class="player-bottomrrow">
                     <p id="player8-pot">
-                    200
+                    9999
                     </p>
                 </div>
                 </div>
@@ -198,7 +198,7 @@
                     </div>
                     <div class="player-bottomrrow">
                         <p id="player9-pot">
-                        50
+                        9999
                         </p>
                     </div>
                 </div>
@@ -267,7 +267,8 @@ export default {
             isActivePlayer: false,
             isBetOut: false,
             isBigBlindCase: false,
-            numberData: 0
+            numberData: 0,
+            previousData: null
         }
     },
     async created() {
@@ -296,11 +297,11 @@ export default {
             this.clearInactive();
             this.updatePot();
             this.updatePlayerValues();
+            this.previousData = this.gameRendering.data;
         },
         gameOver(){
             document.cookie = 'gameId=""'
             window.location.href='/lobby'
-
         },
         clearInactive() {
             for (let i = 1 ; i < 10 ; i++ ) {
@@ -312,11 +313,23 @@ export default {
         updatePlayerValues() {
             let playerNumber = this.gameRendering.data.players.length;
             let startIndex = 0;
+            let isShowHand = false;
 
             for ( let j = 0 ; j < playerNumber ; j++ ) {
                 if ( this.user.username === this.gameRendering.data.players[j].name ) {
                     startIndex = j;
                 }
+            }
+
+            let holdCardCounter = 0;
+            for ( let k = 0 ; k < playerNumber ; k++ ) {
+                let player = this.gameRendering.data.players[k];
+                if ( "holeCards" in player ) {
+                    holdCardCounter++;
+                }
+            }
+            if ( holdCardCounter == playerNumber ) {
+                isShowHand = true;
             }
 
             for ( let i = 0 ; i < playerNumber ; i++ ) {
@@ -343,13 +356,26 @@ export default {
                 playerNameText.innerHTML = playerData.name;
 
                 let playerPointsText = document.getElementById( playerIdentifier + "-points" );
+                
                 playerPointsText.innerHTML = playerData.stackSize;
 
                 //player bet chips
                 let playerBetChips = document.getElementById( playerIdentifier + "-pot" );
-                playerBetChips.innerHTML = playerData.betChips;
+                let isWinner = false; 
+                if ( this.previousData !== null ){ 
+                    isWinner = playerData.stackSize > this.previousData.players[playerIndex].stackSize;
+                }
 
-                if ( this.gameRendering.data.activePlayer !== null && this.gameRendering.data.activePlayer.name === playerData.name ) {
+                if ( isShowHand && isWinner ) {
+                    playerBetChips.innerHTML = "Winner";
+                }
+                else {
+                    playerBetChips.innerHTML = playerData.betChips;
+                }
+
+                if ( (this.gameRendering.data.activePlayer !== null && this.gameRendering.data.activePlayer.name === playerData.name)
+                    || (isShowHand && isWinner) ) 
+                {
                     playerBetChips.style.backgroundColor = "green";
                 }
                 else {
