@@ -17,8 +17,8 @@
                 <div id="player1">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player1card1" :src="require(`../../assets/Resources/cards/${playerCardOne.suit}/${playerCardOne.value}.png`)" alt="card3">
-                    <img id="player1card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.suit}/${playerCardTwo.value}.png`)" alt="card4">
+                    <img id="player1card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player1Suit}/${playerCardOne.player1Value}.png`)" alt="card3">
+                    <img id="player1card2" :src="require(`../../assets/Resources/cards/${playerCardTwo.player1Suit}/${playerCardTwo.player1Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -38,8 +38,8 @@
                 <div id="player2">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player2card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player2card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player2card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player2Suit}/${playerCardOne.player2Value}.png`)" alt="card3">
+                    <img id="player2card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player2Suit}/${playerCardOne.player2Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -59,8 +59,8 @@
                 <div id="player3">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player3card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player3card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player3card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player3Suit}/${playerCardOne.player3Value}.png`)" alt="card3">
+                    <img id="player3card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player3Suit}/${playerCardOne.player3Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -80,8 +80,8 @@
                 <div id="player4">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player4card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player4card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player4card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player4Suit}/${playerCardOne.player4Value}.png`)" alt="card3">
+                    <img id="player4card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player4Suit}/${playerCardOne.player4Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -101,8 +101,8 @@
                 <div id="player5">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player5card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player5card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player5card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player5Suit}/${playerCardOne.player5Value}.png`)" alt="card3">
+                    <img id="player5card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player5Suit}/${playerCardOne.player5Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -122,8 +122,8 @@
                 <div id="player6">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player6card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player6card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player6card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player6Suit}/${playerCardOne.player6Value}.png`)" alt="card3">
+                    <img id="player6card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player6Suit}/${playerCardOne.player6Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -143,8 +143,8 @@
                 <div id="player7">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player7card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player7card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player7card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player7Suit}/${playerCardOne.player7Value}.png`)" alt="card3">
+                    <img id="player7card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player7Suit}/${playerCardOne.player7Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -164,8 +164,8 @@
                 <div id="player8">
                 <div class="player-toprow">
                     <div class="cardcontainer">
-                    <img id="player8card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                    <img id="player8card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                    <img id="player8card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player8Suit}/${playerCardOne.player8Value}.png`)" alt="card3">
+                    <img id="player8card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player8Suit}/${playerCardOne.player8Value}.png`)" alt="card4">
                     </div>
                     <div class="player-points">
                     <p>
@@ -185,8 +185,8 @@
                 <div id="player9">
                     <div class="player-toprow">
                         <div class="cardcontainer">
-                        <img id="player9card1" src="../../assets/Resources/cards/facedown.png" alt="card3">
-                        <img id="player9card2" src="../../assets/Resources/cards/facedown.png" alt="card4">
+                        <img id="player9card1" :src="require(`../../assets/Resources/cards/${playerCardOne.player9Suit}/${playerCardOne.player9Value}.png`)" alt="card3">
+                        <img id="player9card2" :src="require(`../../assets/Resources/cards/${playerCardOne.player9Suit}/${playerCardOne.player9Value}.png`)" alt="card4">
                         </div>
                         <div class="player-points">
                         <p>
@@ -234,8 +234,28 @@ export default {
     },
     data() {
         return {
-            playerCardOne: { suit: 1, value: 2 },
-            playerCardTwo: { suit: 1, value: 2 },
+            playerCardOne: { 
+                                player1Suit: 1, player1Value: 2,
+                                player2Suit: 1, player2Value: 2,
+                                player3Suit: 1, player3Value: 2,
+                                player4Suit: 1, player4Value: 2,
+                                player5Suit: 1, player5Value: 2,
+                                player6Suit: 1, player6Value: 2,
+                                player7Suit: 1, player7Value: 2,
+                                player8Suit: 1, player8Value: 2,
+                                player9Suit: 1, player9Value: 2,
+                           },
+            playerCardTwo: { 
+                                player1Suit: 1, player1Value: 2,
+                                player2Suit: 1, player2Value: 2,
+                                player3Suit: 1, player3Value: 2,
+                                player4Suit: 1, player4Value: 2,
+                                player5Suit: 1, player5Value: 2,
+                                player6Suit: 1, player6Value: 2,
+                                player7Suit: 1, player7Value: 2,
+                                player8Suit: 1, player8Value: 2,
+                                player9Suit: 1, player9Value: 2,
+                            },
             potCardOne: null,
             potCardTwo: null,
             potCardThree: null,
@@ -274,7 +294,7 @@ export default {
     methods:{
         updateUi() {
             this.clearInactive();
-            this.updateBoard();
+            this.updatePot();
             this.updatePlayerValues();
         },
         gameOver(){
@@ -336,6 +356,42 @@ export default {
                     playerBetChips.style.backgroundColor = "blue";
                 }
 
+                //update cards 
+                let holeCardsKey = "holeCards";
+                console.log(playerData.name);
+                console.log("holeCards" in playerData );
+                if ( "holeCards" in playerData ) {
+                    let playerCardOneSuit = playerData.holeCards[0].suit;
+                    let playerCardOneValue = playerData.holeCards[0].value;
+                    let cardSuitPlayer = playerIdentifier + "Suit";
+                    let cardValuePlayer = playerIdentifier + "Value";
+                    this.playerCardOne[cardSuitPlayer] = playerCardOneSuit;
+                    this.playerCardOne[cardValuePlayer] = playerCardOneValue;
+
+                    let playerCardTwoSuit = playerData.holeCards[1].suit;
+                    let playerCardTwoValue = playerData.holeCards[1].value;
+                    cardSuitPlayer = playerIdentifier + "Suit";
+                    cardValuePlayer = playerIdentifier + "Value";
+                    this.playerCardTwo[cardSuitPlayer] = playerCardTwoSuit;
+                    this.playerCardTwo[cardValuePlayer] = playerCardTwoValue;
+                }
+                else {
+                    // file path jank
+                    //"../../assets/Resources/cards/facedown.png"
+                    //`../../assets/Resources/cards/${playerCardOne.suit}/${playerCardOne.value}.png`
+                    let dummyChangeDirSuit = 1;
+                    let dummyChangeDirValue = "facedown";
+                    let cardSuitPlayer = playerIdentifier + "Suit";
+                    let cardValuePlayer = playerIdentifier + "Value";
+                    this.playerCardOne[cardSuitPlayer] = dummyChangeDirSuit;
+                    this.playerCardOne[cardValuePlayer] = dummyChangeDirValue;
+
+                    cardSuitPlayer = playerIdentifier + "Suit";
+                    cardValuePlayer = playerIdentifier + "Value";
+                    this.playerCardTwo[cardSuitPlayer] = dummyChangeDirSuit;
+                    this.playerCardTwo[cardValuePlayer] = dummyChangeDirValue;
+                }
+
                 //fold status
                 let cardOne = document.getElementById( playerIdentifier + "card1");
                 let cardTwo = document.getElementById( playerIdentifier + "card2");
@@ -349,27 +405,7 @@ export default {
                 }
             }
         },
-        updateBoard() {
-            let playerNumber = this.gameRendering.data.players.length;
-            let activeIndex = -1;
-            for ( let j = 0 ; j < playerNumber ; j++ ) {
-                if ( this.user.username === this.gameRendering.data.players[j].name ) {
-                    activeIndex = j;
-                }
-            }
-            
-            //update player cards
-            if ( activeIndex !== -1 )
-            {
-                let playerCardOneSuit = this.gameRendering.data.players[activeIndex].holeCards[0].suit;
-                let playerCardOneValue = this.gameRendering.data.players[activeIndex].holeCards[0].value;
-                this.playerCardOne = { suit: playerCardOneSuit, value: playerCardOneValue };
-
-                let playerCardTwoSuit = this.gameRendering.data.players[activeIndex].holeCards[1].suit;
-                let playerCardTwoValue = this.gameRendering.data.players[activeIndex].holeCards[1].value;
-                this.playerCardTwo = { suit: playerCardTwoSuit, value: playerCardTwoValue };
-            }
-
+        updatePot() {
             //pot cards
             if ( this.gameRendering.data.board.length === 0 ) {
                 this.potCardOne = null;
