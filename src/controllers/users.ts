@@ -109,19 +109,17 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
         await User.createQueryBuilder('user').delete()
         .where("user.username = :username",{
             username: req.body.username,
-        })
+        }).execute()
         res.json({
             success: 'success'
         })
-    
     }
     catch(err){
         res.json({
             fail: 'fail'
         })
     }
-
-
+    console.log("delete user");
 }
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
     let user = await User.findOneOrFail(req.body.id)
