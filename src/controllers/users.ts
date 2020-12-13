@@ -119,7 +119,6 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
             fail: 'fail'
         })
     }
-    console.log("delete user");
 }
 export async function updateUser(req: Request, res: Response, next: NextFunction) {
     let user = await User.findOneOrFail(req.body.id)
@@ -129,7 +128,9 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
         res.json('passwords do not match')
     }else{
         user.username = req.body.username
-        user.password = req.body.newPassword
+        if(req.body.newPassword !== ''){
+            user.password = req.body.newPassword
+        }
         if(req.body.email){
             user.email = req.body.email
         }
